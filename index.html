@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Outsourcing Devs</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>📊 Gestión de Desarrolladores</h1>
+        
+        <!-- Filtros -->
+        <div class="filters">
+            <select id="client-filter">
+                <option value="all">Todos los clientes</option>
+                <option value="client-a">Cliente A</option>
+                <option value="client-b">Cliente B</option>
+            </select>
+            <input type="month" id="date-filter" min="2023-01">
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpis">
+            <div class="kpi" id="total">147</div>
+            <div class="kpi" id="hired">9</div>
+            <div class="kpi" id="exits">5</div>
+            <div class="kpi" id="rotation">3.4%</div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="charts">
+            <canvas id="evolution-chart"></canvas>
+            <canvas id="distribution-chart"></canvas>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

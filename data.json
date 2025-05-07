@@ -1,8 +1,9 @@
-{
+document.addEventListener('DOMContentLoaded', function() {
+    // Your chart initialization code here
     "months": ["Ene-23", "Feb-23", "Mar-23", "Abr-23", "May-23", "Jun-23"],
     "totals": [85, 92, 98, 105, 110, 115],
     "hired": [6, 5, 7, 8, 4, 6],
     "exits": [3, 2, 4, 3, 5, 4],
     "clients": ["Cliente A", "Cliente B", "Cliente C", "Otros mas"],
     "clientsData": [32, 28, 25, 27]
-}
+});

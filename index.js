@@ -24,7 +24,9 @@ new Chart(ctxEvolution, {
     }
 });
 
-// Gráfico de Distribución
+
+
+// Gráfico de Distribución cambiado para pruebas
 const ctxDistribution = document.getElementById('distribution-chart').getContext('2d');
 new Chart(ctxDistribution, {
     type: 'bar',

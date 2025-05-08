@@ -27,15 +27,23 @@ function updateDashboard() {
     try {
         const client = document.getElementById('client-filter').value;
         const year = document.getElementById('year-filter').value;
-        const month = document.getElementById('month-filter').value;
         
         const filteredData = currentData[client]?.[year];
         if (!filteredData) throw new Error('Datos no disponibles');
         
-        const finalData = month === "all" ? filteredData : filterDataByMonth(filteredData, month);
+        // Activar y cargar meses disponibles
+        const monthSelect = document.getElementById('month-filter');
+        monthSelect.innerHTML = '<option value="all">Todos los meses</option>';
         
-        updateKPIs(finalData);
-        updateCharts(finalData, client, year, month);
+        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        months.slice(0, filteredData.totals.length).forEach((month, index) => {
+            monthSelect.innerHTML += `<option value="${index}">${month}</option>`;
+        });
+        
+        monthSelect.disabled = false;
+        const month = monthSelect.value;
+        
+        // Resto de tu código...
     } catch (error) {
         console.error('Error:', error);
     }

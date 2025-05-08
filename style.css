@@ -28,6 +28,12 @@ body {
     min-width: 120px; /* Ancho más compacto */
 }
 
+.filter-dropdown:disabled {
+    opacity: 0.7;
+    background-color: #f5f5f5;
+}
+
+
 /* Tarjetas KPIs */
 .kpis {
     display: grid;

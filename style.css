@@ -4,7 +4,6 @@ body {
     margin: 0;
     padding: 20px;
     background-color: #f5f7fa;
-    min-height: 100vh;
 }
 
 .dashboard {
@@ -15,9 +14,9 @@ body {
 /* Filtros */
 .filters {
     display: flex;
+    gap: 15px;
     margin: 20px 0;
     flex-wrap: wrap;
-    gap: 10px; /* Espacio más compacto entre filtros */
 }
 
 .filter-dropdown {
@@ -25,14 +24,13 @@ body {
     border-radius: 6px;
     border: 1px solid #ddd;
     font-size: 14px;
-    min-width: 120px; /* Ancho más compacto */
+    min-width: 150px;
 }
 
 .filter-dropdown:disabled {
     opacity: 0.7;
     background-color: #f5f5f5;
 }
-
 
 /* Tarjetas KPIs */
 .kpis {
@@ -72,56 +70,35 @@ body {
 .red .kpi-value { color: #e74c3c; }
 .orange .kpi-value { color: #f39c12; }
 
-/* Contenedor de gráficos */
+/* Gráficos */
 .charts-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 25px; /* Más espacio entre gráficos */
-    margin: 20px -10px; /* Compensación */
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 20px;
 }
 
 .chart-wrapper {
-    width: 100%;
     background: white;
     border-radius: 8px;
-    padding: 15px 10px; /* Menos padding horizontal */
-    margin: 0 5px; /* Pequeño margen adicional */
+    padding: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.chart-responsive {
-    position: relative;
-    width: 100%;
-    padding-bottom: 56.25%; /* Relación 16:9 */
-}
-
-.chart-responsive canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100% !important;
-    height: 100% !important;
+    min-height: 300px;
 }
 
 .chart-message {
     font-size: 12px;
     color: #999;
     text-align: center;
-    margin-top: 8px;
+    margin-top: 10px;
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .charts-container {
         grid-template-columns: 1fr;
     }
     
-    .chart-responsive {
-        padding-bottom: 75%; /* Más alto en móviles */
-    }
-}
-
-@media (max-width: 480px) {
     .kpis {
         grid-template-columns: 1fr 1fr;
     }

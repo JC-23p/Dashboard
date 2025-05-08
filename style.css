@@ -54,12 +54,64 @@ body {
     font-size: 12px;
     color: #777;
   }
+  /* Sistema de tamaños basado en la raíz (1rem = 10px para fácil cálculo) */
+html {
+    font-size: 62.5%; 
+  }
   
-  /* Colores para cada tarjeta */
-  .green .kpi-value { color: #2ecc71; }  /* Ingresos */
-  .red .kpi-value { color: #e74c3c; }    /* Salidas */
-  .orange .kpi-value { color: #f39c12; } /* Rotación */
+  /* Contenedor flexible de KPIs */
+  .kpis {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las tarjetas se apilen en móviles */
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
   
+  /* Tarjetas responsivas */
+  .kpi-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 0.3rem 0.6rem rgba(0,0,0,0.1);
+    flex: 1 1 20rem; /* Crecen pero mínimo 20rem de ancho */
+    min-width: 12rem; /* Evita que se compriman demasiado */
+  }
+  
+  /* Textos escalables */
+  .kpi-title {
+    font-size: clamp(1.2rem, 1.5vw, 1.6rem); /* Responsive entre 12px y 16px */
+    color: #555;
+    margin-bottom: 0.5rem;
+  }
+  
+  .kpi-value {
+    font-size: clamp(2.4rem, 3vw, 3.2rem); /* Responsive entre 24px y 32px */
+    font-weight: bold;
+    margin: 1rem 0;
+  }
+  
+  .kpi-subtitle {
+    font-size: clamp(1rem, 1.2vw, 1.4rem); /* Responsive entre 10px y 14px */
+    color: #777;
+  }
+  
+  /* Colores (opcional) */
+  .green .kpi-value { color: #27ae60; }
+  .red .kpi-value { color: #e74c3c; }
+  .orange .kpi-value { color: #f39c12; }
+  
+  /* Ajustes para móviles */
+  @media (max-width: 768px) {
+    .kpi-card {
+      flex: 1 1 15rem; /* Tarjetas más estrechas en móviles */
+    }
+    
+    .kpi-value {
+      font-size: 2.8rem; /* Tamaño fijo en móviles para mejor legibilidad */
+    }
+  }
+
 .charts {
     display: grid;
     grid-template-columns: 1fr 1fr;

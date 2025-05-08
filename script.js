@@ -48,7 +48,7 @@ function updateKPIs(data) {
     const exits = data.exits[lastIndex];
     
     const prevTotal = data.totals[lastIndex - 1] || total;
-    const rotation = ((exits / ((total + prevTotal) / 2) * 100).toFixed(1);
+    const rotation = ((exits / ((total + prevTotal) / 2)) * 100).toFixed(1);
     
     document.getElementById('total').textContent = total;
     document.getElementById('hired').textContent = hired;
@@ -105,7 +105,6 @@ function updateCharts(data, client, year, month) {
     }
 }
 
-// Funciones auxiliares
 function filterDataByMonth(data, monthIndex) {
     return {
         totals: [data.totals[monthIndex]],

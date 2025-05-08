@@ -121,13 +121,15 @@ html {
 canvas {
     width: 100% !important;
     height: auto !important;
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-       
+    margin-top: 10px;
     
 }
+
+
 
 .filters {
     display: flex;

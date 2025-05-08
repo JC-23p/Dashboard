@@ -2,69 +2,75 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Outsourcing Devs</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="dashboard">
-        <h1>📊 Gestión de Desarrolladores</h1>
-        
-        <!-- Filtros -->
-    
-        <div class="filters">
-            <!-- Filtro por Cliente -->
-            <select id="client-filter" class="filter-dropdown">
-              <option value="all">Todos los clientes</option>
-              <option value="client-a">Cliente A</option>
-              <option value="client-b">Cliente B</option>
-              <option value="client-c">Cliente C</option>
-            </select>
-          
-            <!-- Filtro por Año -->
-            <select id="year-filter" class="filter-dropdown">
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
-              <option value="2025" selected>2025</option>
-            </select>
-          </div>
-        <!-- KPIs -->
-        <div class="kpis">
-            <!-- Tarjeta 1: Total -->
-            <div class="kpi-card">
-              <div class="kpi-title">👥 Total Activos</div>
-              <div class="kpi-value" id="total">147</div>
-              <div class="kpi-subtitle">Desarrolladores actuales</div>
+        <header>
+            <h1>📊 Gestión de Desarrolladores</h1>
+            <div class="filters">
+                <!-- Filtro por Cliente -->
+                <select id="client-filter" class="filter-dropdown">
+                    <option value="all">Todos los clientes</option>
+                    <option value="client-a">Cliente A</option>
+                    <option value="client-b">Cliente B</option>
+                    <option value="client-c">Cliente C</option>
+                </select>
+                
+                <!-- Filtro por Año -->
+                <select id="year-filter" class="filter-dropdown">
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025" selected>2025</option>
+                </select>
             </div>
-          
-            <!-- Tarjeta 2: Ingresos -->
-            <div class="kpi-card green">
-              <div class="kpi-title">📥 Ingresos (mes)</div>
-              <div class="kpi-value" id="hired">9</div>
-              <div class="kpi-subtitle">Nuevos o reemplazos</div>
-            </div>
-          
-            <!-- Tarjeta 3: Salidas -->
-            <div class="kpi-card red">
-              <div class="kpi-title">📤 Salidas (mes)</div>
-              <div class="kpi-value" id="exits">5</div>
-              <div class="kpi-subtitle">Rotación o fin de proyecto</div>
-            </div>
-          
-            <!-- Tarjeta 4: Rotación -->
-            <div class="kpi-card orange">
-              <div class="kpi-title">🔄 Tasa de Rotación</div>
-              <div class="kpi-value" id="rotation">3.4%</div>
-              <div class="kpi-subtitle">(Salidas/Promedio) × 100</div>
-            </div>
-          </div>
+        </header>
 
-        <!-- Gráficos -->
-        <div class="charts">
-            <canvas id="evolution-chart"></canvas>
-            <canvas id="distribution-chart"></canvas>
-        </div>
+        <!-- Sección de KPIs -->
+        <section class="kpis">
+            <div class="kpi-card">
+                <div class="kpi-title">👥 Total Activos</div>
+                <div class="kpi-value" id="total">147</div>
+                <div class="kpi-subtitle">Desarrolladores actuales</div>
+            </div>
+            
+            <div class="kpi-card green">
+                <div class="kpi-title">📥 Ingresos (mes)</div>
+                <div class="kpi-value" id="hired">9</div>
+                <div class="kpi-subtitle">Nuevos o reemplazos</div>
+            </div>
+            
+            <div class="kpi-card red">
+                <div class="kpi-title">📤 Salidas (mes)</div>
+                <div class="kpi-value" id="exits">5</div>
+                <div class="kpi-subtitle">Rotación o fin de proyecto</div>
+            </div>
+            
+            <div class="kpi-card orange">
+                <div class="kpi-title">🔄 Tasa de Rotación</div>
+                <div class="kpi-value" id="rotation">3.4%</div>
+                <div class="kpi-subtitle">(Salidas/Promedio) × 100</div>
+            </div>
+        </section>
+
+        <!-- Sección de Gráficos -->
+        <section class="charts-container">
+            <div class="chart-wrapper">
+                <canvas id="evolution-chart"></canvas>
+                <p class="chart-title">Evolución Mensual</p>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="distribution-chart"></canvas>
+                <p class="chart-title">Distribución por Cliente</p>
+                <p class="info-message" style="display: none;">Disponible solo en "Todos los clientes"</p>
+            </div>
+        </section>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

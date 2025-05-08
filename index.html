@@ -22,11 +22,34 @@
 
         <!-- KPIs -->
         <div class="kpis">
-            <div class="kpi" id="total">147</div>
-            <div class="kpi" id="hired">9</div>
-            <div class="kpi" id="exits">5</div>
-            <div class="kpi" id="rotation">3.4%</div>
-        </div>
+            <!-- Tarjeta 1: Total -->
+            <div class="kpi-card">
+              <div class="kpi-title">👥 Total Activos</div>
+              <div class="kpi-value" id="total">147</div>
+              <div class="kpi-subtitle">Desarrolladores actuales</div>
+            </div>
+          
+            <!-- Tarjeta 2: Ingresos -->
+            <div class="kpi-card green">
+              <div class="kpi-title">📥 Ingresos (mes)</div>
+              <div class="kpi-value" id="hired">9</div>
+              <div class="kpi-subtitle">Nuevos o reemplazos</div>
+            </div>
+          
+            <!-- Tarjeta 3: Salidas -->
+            <div class="kpi-card red">
+              <div class="kpi-title">📤 Salidas (mes)</div>
+              <div class="kpi-value" id="exits">5</div>
+              <div class="kpi-subtitle">Rotación o fin de proyecto</div>
+            </div>
+          
+            <!-- Tarjeta 4: Rotación -->
+            <div class="kpi-card orange">
+              <div class="kpi-title">🔄 Tasa de Rotación</div>
+              <div class="kpi-value" id="rotation">3.4%</div>
+              <div class="kpi-subtitle">(Salidas/Promedio) × 100</div>
+            </div>
+          </div>
 
         <!-- Gráficos -->
         <div class="charts">

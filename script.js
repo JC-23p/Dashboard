@@ -23,27 +23,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Función para cargar meses disponibles
+function loadMonthFilter(monthsData) {
+    const monthSelect = document.getElementById('month-filter');
+    monthSelect.innerHTML = '<option value="all">Todos los meses</option>';
+    
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    
+    // Solo muestra meses con datos existentes
+    monthNames.slice(0, monthsData.totals.length).forEach((month, index) => {
+        monthSelect.innerHTML += `<option value="${index}">${month}</option>`;
+    });
+    
+    monthSelect.disabled = false;
+}
+
+// En updateDashboard():
 function updateDashboard() {
     try {
         const client = document.getElementById('client-filter').value;
         const year = document.getElementById('year-filter').value;
+        const monthSelect = document.getElementById('month-filter');
         
         const filteredData = currentData[client]?.[year];
         if (!filteredData) throw new Error('Datos no disponibles');
         
-        // Activar y cargar meses disponibles
-        const monthSelect = document.getElementById('month-filter');
-        monthSelect.innerHTML = '<option value="all">Todos los meses</option>';
+        // Cargar meses solo si cambió el año
+        if (monthSelect.disabled || monthSelect.dataset.currentYear !== year) {
+            loadMonthFilter(filteredData);
+            monthSelect.dataset.currentYear = year; // Marcar año actual
+        }
         
-        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-        months.slice(0, filteredData.totals.length).forEach((month, index) => {
-            monthSelect.innerHTML += `<option value="${index}">${month}</option>`;
-        });
-        
-        monthSelect.disabled = false;
         const month = monthSelect.value;
+        const finalData = month === "all" ? filteredData : filterDataByMonth(filteredData, month);
         
-        // Resto de tu código...
+        updateKPIs(finalData);
+        updateCharts(finalData, client, year, month);
+        
     } catch (error) {
         console.error('Error:', error);
     }

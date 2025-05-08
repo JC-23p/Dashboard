@@ -17,10 +17,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('client-filter').addEventListener('change', updateDashboard);
         document.getElementById('year-filter').addEventListener('change', updateDashboard);
         
-        // 3. Carga inicial
+        // 3. Redimensionar al cambiar ventana
+        window.addEventListener('resize', () => {
+            if (charts.evolution) charts.evolution.resize();
+            if (charts.distribution) charts.distribution.resize();
+        });
+        
+        // 4. Carga inicial
         updateDashboard();
     } catch (error) {
         console.error('Error:', error);
+        alert('Error al cargar los datos. Ver consola.');
     }
 });
 
@@ -29,15 +36,23 @@ function updateDashboard() {
     try {
         const client = document.getElementById('client-filter').value;
         const year = document.getElementById('year-filter').value;
+        const month = document.getElementById('month-filter').value;
+        
         const filteredData = currentData[client]?.[year];
+        if (!filteredData) throw new Error('Datos no disponibles');
         
-        if (!filteredData) return;
+        // Actualizar selector de meses
+        if (month === "all") {
+            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+                          .slice(0, filteredData.totals.length);
+            populateMonthFilter(months);
+        }
         
-        // 1. Actualizar KPIs
-        updateKPIs(filteredData);
+        // Filtrar por mes si es necesario
+        const finalData = month === "all" ? filteredData : filterDataByMonth(filteredData, month);
         
-        // 2. Actualizar gráficos
-        updateCharts(filteredData, client, year);
+        updateKPIs(finalData);
+        updateCharts(finalData, client, year, month);
         
     } catch (error) {
         console.error('Error:', error);
@@ -63,64 +78,134 @@ function updateKPIs(data) {
 }
 
 // Actualizar gráficos
-function updateCharts(data, client, year) {
-    const ctxEvolution = document.getElementById('evolution-chart');
-    const ctxDistribution = document.getElementById('distribution-chart');
+function updateCharts(data, client, year, month) {
     
-    // Destruir gráficos existentes
-    if (charts.evolution) charts.evolution.destroy();
-    if (charts.distribution) charts.distribution.destroy();
-    
-    // 1. Gráfico de evolución (siempre visible)
-    charts.evolution = new Chart(ctxEvolution, {
-        type: 'line',
-        data: {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'].slice(0, data.totals.length),
-            datasets: [{
-                label: `Total (${client}, ${year})`,
-                data: data.totals,
-                borderColor: '#2E86AB',
-                backgroundColor: 'rgba(46, 134, 171, 0.1)',
-                fill: true,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
-    
-    // 2. Gráfico de distribución (solo para "all")
-    if (client === 'all' && data.clients && data.clientsData) {
-        charts.distribution = new Chart(ctxDistribution, {
-            type: 'bar',
+    function updateCharts(data, client, year, month) {
+        const ctxEvolution = document.getElementById('evolution-chart');
+        const ctxDistribution = document.getElementById('distribution-chart');
+        
+        // Destruir gráficos existentes
+        if (charts.evolution) charts.evolution.destroy();
+        if (charts.distribution) charts.distribution.destroy();
+        
+        // Configurar labels según filtro
+        const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const labels = month === "all" 
+            ? monthLabels.slice(0, data.totals.length)
+            : [`${monthLabels[month]} ${year}`];
+        
+        // 1. Gráfico de evolución
+        charts.evolution = new Chart(ctxEvolution, {
+            type: month === "all" ? 'line' : 'bar', // Cambia a barra para un solo mes
             data: {
-                labels: data.clients,
+                labels: labels,
                 datasets: [{
-                    label: 'Desarrolladores',
-                    data: data.clientsData,
-                    backgroundColor: ['#2E86AB', '#4CB944', '#E94F64', '#FFD166']
+                    label: client === "all" ? `Total (${year})` : `Total (${client})`,
+                    data: month === "all" ? data.totals : [data.totals[0]],
+                    borderColor: '#2E86AB',
+                    backgroundColor: month === "all" 
+                        ? 'rgba(46, 134, 171, 0.1)' 
+                        : '#2E86AB',
+                    fill: month === "all",
+                    tension: 0.3,
+                    borderWidth: month === "all" ? 2 : 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false }
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
                 }
             }
         });
-        document.querySelector('.chart-message').style.display = 'none';
-    } else {
-        document.querySelector('.chart-message').style.display = 'block';
-    }
+        
+        // 2. Gráfico de distribución (solo para "all" y si hay datos)
+        if (client === "all" && data.clients && data.clientsData) {
+            charts.distribution = new Chart(ctxDistribution, {
+                type: 'bar',
+                data: {
+                    labels: data.clients,
+                    datasets: [{
+                        label: 'Distribución',
+                        data: data.clientsData,
+                        backgroundColor: ['#2E86AB', '#4CB944', '#E94F64', '#FFD166'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw} devs (${Math.round(context.raw/data.totals[0]*100)}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            document.querySelector('.chart-message').style.display = 'none';
+        } else {
+            document.querySelector('.chart-message').style.display = 'block';
+        }
+        
+        // Ajuste final para gráfico de un solo mes
+        if (month !== "all") {
+            charts.evolution.options.scales.x.ticks = {
+                callback: function() { return monthLabels[month] + ' ' + year; }
+            };
+            charts.evolution.update();
+        }
+    } 
+
+// Configuración común de gráficos
+function getChartOptions(title) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: title,
+                font: { size: 14 },
+                padding: { top: 10, bottom: 15 }
+            }
+        },
+        scales: {
+            y: { beginAtZero: false }
+        },
+        layout: {
+            padding: { top: 5, bottom: 5, left: 10, right: 10 }
+        }
+    };
 }
-// Agrega al final de script.js
-window.addEventListener('resize', () => {
-    if (charts.evolution) charts.evolution.resize();
-    if (charts.distribution) charts.distribution.resize();
-});

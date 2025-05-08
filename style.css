@@ -15,9 +15,9 @@ body {
 /* Filtros */
 .filters {
     display: flex;
-    gap: 15px;
     margin: 20px 0;
     flex-wrap: wrap;
+    gap: 10px; /* Espacio más compacto entre filtros */
 }
 
 .filter-dropdown {
@@ -25,7 +25,7 @@ body {
     border-radius: 6px;
     border: 1px solid #ddd;
     font-size: 14px;
-    min-width: 150px;
+    min-width: 120px; /* Ancho más compacto */
 }
 
 /* Tarjetas KPIs */
@@ -70,15 +70,16 @@ body {
 .charts-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+    gap: 25px; /* Más espacio entre gráficos */
+    margin: 20px -10px; /* Compensación */
 }
 
 .chart-wrapper {
     width: 100%;
     background: white;
     border-radius: 8px;
-    padding: 15px;
+    padding: 15px 10px; /* Menos padding horizontal */
+    margin: 0 5px; /* Pequeño margen adicional */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 

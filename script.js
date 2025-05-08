@@ -119,3 +119,8 @@ function updateCharts(data, client, year) {
         document.querySelector('.chart-message').style.display = 'block';
     }
 }
+// Agrega al final de script.js
+window.addEventListener('resize', () => {
+    if (charts.evolution) charts.evolution.resize();
+    if (charts.distribution) charts.distribution.resize();
+});

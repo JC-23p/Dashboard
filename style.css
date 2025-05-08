@@ -1,8 +1,9 @@
+/* Estilos generales */
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    background: #f5f7fa;
+    background-color: #f5f7fa;
 }
 
 .dashboard {
@@ -10,149 +11,88 @@ body {
     margin: 0 auto;
 }
 
-.kpis {
+/* Filtros */
+.filters {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     margin: 20px 0;
 }
 
-.kpi {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    flex: 1;
+.filter-dropdown {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
 }
 
-/* Estilos para las tarjetas de KPIs */
+/* Tarjetas KPIs */
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
 .kpi-card {
     background: white;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     text-align: center;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-    flex: 1;
-    margin: 0 10px;
-  }
-  
-  .kpi-title {
+}
+
+.kpi-title {
     font-size: 14px;
     color: #555;
     margin-bottom: 5px;
-  }
-  
-  .kpi-value {
-    font-size: 28px;
+}
+
+.kpi-value {
+    font-size: 24px;
     font-weight: bold;
     margin: 10px 0;
-  }
-  
-  .kpi-subtitle {
+}
+
+.kpi-subtitle {
     font-size: 12px;
     color: #777;
-  }
-  /* Sistema de tamaños basado en la raíz (1rem = 10px para fácil cálculo) */
-html {
-    font-size: 62.5%; 
-  }
-  
-  /* Contenedor flexible de KPIs */
-  .kpis {
-    display: flex;
-    flex-wrap: wrap; /* Permite que las tarjetas se apilen en móviles */
-    gap: 1.5rem;
-    margin: 2rem 0;
-  }
-  
-  /* Tarjetas responsivas */
-  .kpi-card {
-    background: white;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 0.3rem 0.6rem rgba(0,0,0,0.1);
-    flex: 1 1 20rem; /* Crecen pero mínimo 20rem de ancho */
-    min-width: 12rem; /* Evita que se compriman demasiado */
-  }
-  
-  /* Textos escalables */
-  .kpi-title {
-    font-size: clamp(1.2rem, 1.5vw, 1.6rem); /* Responsive entre 12px y 16px */
-    color: #555;
-    margin-bottom: 0.5rem;
-  }
-  
-  .kpi-value {
-    font-size: clamp(2.4rem, 3vw, 3.2rem); /* Responsive entre 24px y 32px */
-    font-weight: bold;
-    margin: 1rem 0;
-  }
-  
-  .kpi-subtitle {
-    font-size: clamp(1rem, 1.2vw, 1.4rem); /* Responsive entre 10px y 14px */
-    color: #777;
-  }
-  
-  /* Colores (opcional) */
-  .green .kpi-value { color: #27ae60; }
-  .red .kpi-value { color: #e74c3c; }
-  .orange .kpi-value { color: #f39c12; }
-  
-  /* Ajustes para móviles */
-  @media (max-width: 768px) {
-    .kpi-card {
-      flex: 1 1 15rem; /* Tarjetas más estrechas en móviles */
-    }
-    
-    .kpi-value {
-      font-size: 2.8rem; /* Tamaño fijo en móviles para mejor legibilidad */
-    }
-  }
+}
 
+/* Colores tarjetas */
+.green .kpi-value { color: #2ecc71; }
+.red .kpi-value { color: #e74c3c; }
+.orange .kpi-value { color: #f39c12; }
+
+/* Gráficos */
 .charts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 20px;
 }
 
-canvas {
-    width: 100% !important;
-    height: auto !important;
-    background: #f8f9fa;
-    border-radius: 5px;
-    padding: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    margin-top: 10px;
-    
+.chart-container {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 280px;
+    position: relative;
 }
 
+.chart-message {
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    margin-top: 10px;
+}
 
-
-.filters {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-  }
-  
-  .filter-dropdown {
-    padding: 0.8rem 1.2rem;
-    border-radius: 0.8rem;
-    border: 1px solid #ddd;
-    font-size: 1.4rem;
-    background: white;
-    min-width: 15rem;
-  }
-  
-  @media (max-width: 768px) {
-    .filters {
-      flex-direction: column;
+/* Responsive */
+@media (max-width: 768px) {
+    .kpis {
+        grid-template-columns: repeat(2, 1fr);
     }
     
-    .filter-dropdown {
-      width: 100%;
+    .charts {
+        flex-direction: column;
     }
-  }
+}

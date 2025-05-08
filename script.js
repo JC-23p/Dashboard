@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 1. Cargar datos
         const response = await fetch('./data.json');
-        if (!response.ok) throw new Error('Error al cargar data.json');
+        if (!response.ok) throw new Error('Error al cargar datos');
         currentData = await response.json();
         
         // 2. Configurar eventos
@@ -21,27 +21,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateDashboard();
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al cargar datos. Ver consola.');
     }
 });
 
-// Actualizar dashboard completo
+// Actualizar dashboard
 function updateDashboard() {
     try {
         const client = document.getElementById('client-filter').value;
         const year = document.getElementById('year-filter').value;
         const filteredData = currentData[client]?.[year];
         
-        if (!filteredData) throw new Error('Datos no disponibles');
+        if (!filteredData) return;
         
-        // Destruir gráficos anteriores
-        if (charts.evolution) charts.evolution.destroy();
-        if (charts.distribution) charts.distribution.destroy();
-        
-        // Actualizar KPIs
+        // 1. Actualizar KPIs
         updateKPIs(filteredData);
         
-        // Actualizar gráficos
+        // 2. Actualizar gráficos
         updateCharts(filteredData, client, year);
         
     } catch (error) {
@@ -49,7 +44,7 @@ function updateDashboard() {
     }
 }
 
-// Función para actualizar KPIs
+// Actualizar KPIs
 function updateKPIs(data) {
     const lastIndex = data.totals.length - 1;
     const total = data.totals[lastIndex];
@@ -67,18 +62,22 @@ function updateKPIs(data) {
     document.getElementById('rotation').textContent = `${rotation}%`;
 }
 
-// Función para actualizar gráficos
+// Actualizar gráficos
 function updateCharts(data, client, year) {
     const ctxEvolution = document.getElementById('evolution-chart');
     const ctxDistribution = document.getElementById('distribution-chart');
     
-    // Gráfico de evolución (siempre visible)
+    // Destruir gráficos existentes
+    if (charts.evolution) charts.evolution.destroy();
+    if (charts.distribution) charts.distribution.destroy();
+    
+    // 1. Gráfico de evolución (siempre visible)
     charts.evolution = new Chart(ctxEvolution, {
         type: 'line',
         data: {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'].slice(0, data.totals.length),
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'].slice(0, data.totals.length),
             datasets: [{
-                label: `Evolución (${client}, ${year})`,
+                label: `Total (${client}, ${year})`,
                 data: data.totals,
                 borderColor: '#2E86AB',
                 backgroundColor: 'rgba(46, 134, 171, 0.1)',
@@ -88,31 +87,35 @@ function updateCharts(data, client, year) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            }
         }
     });
     
-    // Gráfico de distribución (solo para "all")
+    // 2. Gráfico de distribución (solo para "all")
     if (client === 'all' && data.clients && data.clientsData) {
         charts.distribution = new Chart(ctxDistribution, {
             type: 'bar',
             data: {
                 labels: data.clients,
                 datasets: [{
-                    label: 'Distribución por cliente',
+                    label: 'Desarrolladores',
                     data: data.clientsData,
                     backgroundColor: ['#2E86AB', '#4CB944', '#E94F64', '#FFD166']
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                }
             }
         });
+        document.querySelector('.chart-message').style.display = 'none';
     } else {
-        // Ocultar canvas si no es "all"
-        ctxDistribution.style.display = 'none';
-         // Opcional: Mostrar mensaje
-    ctxDistribution.insertAdjacentHTML('afterend', '<p class="info-message">Distribución solo disponible para "Todos los clientes"</p>');
+        document.querySelector('.chart-message').style.display = 'block';
     }
 }

@@ -6,32 +6,29 @@
     <title>Dashboard Outsourcing Devs</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="dashboard">
-        <header>
-            <h1>📊 Gestión de Desarrolladores</h1>
-            <div class="filters">
-                <!-- Filtro por Cliente -->
-                <select id="client-filter" class="filter-dropdown">
-                    <option value="all">Todos los clientes</option>
-                    <option value="client-a">Cliente A</option>
-                    <option value="client-b">Cliente B</option>
-                    <option value="client-c">Cliente C</option>
-                </select>
-                
-                <!-- Filtro por Año -->
-                <select id="year-filter" class="filter-dropdown">
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
-                    <option value="2025" selected>2025</option>
-                </select>
-            </div>
-        </header>
+        <h1>📊 Gestión de Desarrolladores</h1>
+        
+        <!-- Filtros -->
+        <div class="filters">
+            <select id="client-filter" class="filter-dropdown">
+                <option value="all">Todos los clientes</option>
+                <option value="client-a">Cliente A</option>
+                <option value="client-b">Cliente B</option>
+                <option value="client-c">Cliente C</option>
+            </select>
+            
+            <select id="year-filter" class="filter-dropdown">
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025" selected>2025</option>
+            </select>
+        </div>
 
-        <!-- Sección de KPIs -->
-        <section class="kpis">
+        <!-- KPIs -->
+        <div class="kpis">
             <div class="kpi-card">
                 <div class="kpi-title">👥 Total Activos</div>
                 <div class="kpi-value" id="total">147</div>
@@ -55,20 +52,18 @@
                 <div class="kpi-value" id="rotation">3.4%</div>
                 <div class="kpi-subtitle">(Salidas/Promedio) × 100</div>
             </div>
-        </section>
+        </div>
 
-        <!-- Sección de Gráficos -->
-        <section class="charts-container">
-            <div class="chart-wrapper">
+        <!-- Gráficos Compactos -->
+        <div class="charts">
+            <div class="chart-container">
                 <canvas id="evolution-chart"></canvas>
-                <p class="chart-title">Evolución Mensual</p>
             </div>
-            <div class="chart-wrapper">
+            <div class="chart-container">
                 <canvas id="distribution-chart"></canvas>
-                <p class="chart-title">Distribución por Cliente</p>
-                <p class="info-message" style="display: none;">Disponible solo en "Todos los clientes"</p>
+                <p class="chart-message">* Distribución visible solo en "Todos los clientes"</p>
             </div>
-        </section>
+        </div>
     </div>
 
     <script src="script.js"></script>

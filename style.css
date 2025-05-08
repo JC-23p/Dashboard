@@ -128,3 +128,29 @@ canvas {
        
     
 }
+
+.filters {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .filter-dropdown {
+    padding: 0.8rem 1.2rem;
+    border-radius: 0.8rem;
+    border: 1px solid #ddd;
+    font-size: 1.4rem;
+    background: white;
+    min-width: 15rem;
+  }
+  
+  @media (max-width: 768px) {
+    .filters {
+      flex-direction: column;
+    }
+    
+    .filter-dropdown {
+      width: 100%;
+    }
+  }

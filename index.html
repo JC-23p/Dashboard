@@ -11,15 +11,23 @@
         <h1>📊 Gestión de Desarrolladores</h1>
         
         <!-- Filtros -->
+    
         <div class="filters">
-            <select id="client-filter">
-                <option value="all">Todos los clientes</option>
-                <option value="client-a">Cliente A</option>
-                <option value="client-b">Cliente B</option>
+            <!-- Filtro por Cliente -->
+            <select id="client-filter" class="filter-dropdown">
+              <option value="all">Todos los clientes</option>
+              <option value="client-a">Cliente A</option>
+              <option value="client-b">Cliente B</option>
+              <option value="client-c">Cliente C</option>
             </select>
-            <input type="month" id="date-filter" min="2023-01">
-        </div>
-
+          
+            <!-- Filtro por Año -->
+            <select id="year-filter" class="filter-dropdown">
+              <option value="2023">2023</option>
+              <option value="2024">2024</option>
+              <option value="2025" selected>2025</option>
+            </select>
+          </div>
         <!-- KPIs -->
         <div class="kpis">
             <!-- Tarjeta 1: Total -->

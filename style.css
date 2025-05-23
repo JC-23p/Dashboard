@@ -113,3 +113,31 @@ body {
         width: 100%;
     }
 }
+
+/* Estilos específicos para gráfico de torta */
+.doughnut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.doughnut-legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+}
+
+.doughnut-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+/* Mejorar aspecto del doughnut */
+.chart-wrapper canvas {
+    max-height: 300px;
+    margin: 0 auto;
+}

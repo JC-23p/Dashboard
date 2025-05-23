@@ -157,7 +157,7 @@ function updateCharts(data, client, yearFrom, yearTo) {
         }
     }
     
-    // 1. Gráfico de evolución
+    // 1. Gráfico de evolución (se mantiene igual)
     charts.evolution = new Chart(ctxEvolution, {
         type: data.totals.length > 1 ? 'line' : 'bar',
         data: {
@@ -175,7 +175,7 @@ function updateCharts(data, client, yearFrom, yearTo) {
         options: getChartOptions('Evolución de desarrolladores')
     });
     
-    // 2. Gráfico de distribución (solo para "all")
+    // 2. Nuevo gráfico de torta para distribución (solo para "all")
     if (client === "all" && data.clients && data.clientsData) {
         charts.distribution = new Chart(ctxDistribution, {
             type: 'doughnut',
@@ -183,16 +183,48 @@ function updateCharts(data, client, yearFrom, yearTo) {
                 labels: data.clients,
                 datasets: [{
                     data: data.clientsData,
-                    backgroundColor: ['#2E86AB', '#4CB944', '#E94F64', '#FFD166'],
-                    borderWidth: 0
+                    backgroundColor: [
+                        '#2E86AB',  // Azul
+                        '#4CB944',  // Verde
+                        '#E94F64',  // Rojo
+                        '#FFD166'   // Amarillo
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 10
                 }]
             },
             options: {
-                ...getChartOptions('Distribución por cliente'),
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'right'
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: `Distribución ${labels[labels.length-1]}`,
+                        font: { size: 14 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
                     }
+                },
+                cutout: '65%',
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
                 }
             }
         });

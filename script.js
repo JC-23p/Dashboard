@@ -189,7 +189,7 @@ function updateCharts(data, client, yearFrom, yearTo) {
             labels: labels,
             datasets: [
                 {
-                    label: 'Totales',
+                    label: 'Total Activos ',
                     data: data.totals,
                     borderColor: '#2E86AB',
                     backgroundColor: 'rgba(46, 134, 171, 0.1)',
@@ -198,7 +198,7 @@ function updateCharts(data, client, yearFrom, yearTo) {
                     fill: true
                 },
                 {
-                    label: 'Entradas',
+                    label: 'Altas ',
                     data: data.hired,
                     borderColor: '#2ecc71',
                     backgroundColor: 'rgba(46, 204, 113, 0.1)',
@@ -207,7 +207,7 @@ function updateCharts(data, client, yearFrom, yearTo) {
                     tension: 0
                 },
                 {
-                    label: 'Salidas',
+                    label: 'Bajas ',
                     data: data.exits,
                     borderColor: '#e74c3c',
                     backgroundColor: 'rgba(231, 76, 60, 0.1)',

@@ -190,41 +190,62 @@ function updateCharts(data, client, yearFrom, yearTo) {
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        boxWidth: 12,
-                        padding: 20,
-                        usePointStyle: true
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Evolución mensual',
-                    font: { size: 14 }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
+    responsive: true,
+    maintainAspectRatio: false, // Importante para control manual
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: {
+                boxWidth: 12,
+                padding: 20,
+                usePointStyle: true
+            }
+        },
+        title: {
+            display: true,
+            text: 'Evolución mensual',
+            font: { size: 14 }
+        },
+        tooltip: {
+            mode: 'index',
+            intersect: false
+        }
+    },
+    scales: {
+        y: {
+            beginAtZero: false,
+            title: {
+                display: true,
+                text: 'Cantidad de desarrolladores'
             },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Cantidad de desarrolladores'
-                    }
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'nearest'
+            // Ajustar espacio para valores bajos
+            min: function(context) {
+                const minValue = Math.min(...context.chart.data.datasets.flatMap(d => d.data));
+                return Math.max(0, minValue - 5); // Margen inferior
+            }
+        },
+        x: {
+            // Mover eje X más arriba
+            position: 'top', // Cambiado de 'bottom' a 'top'
+            ticks: {
+                padding: 10 // Espacio adicional
             }
         }
+    },
+    layout: {
+        padding: {
+            top: 20,
+            bottom: 40, // Más espacio en la parte inferior
+            left: 20,
+            right: 20
+        }
+    },
+    elements: {
+        line: {
+            tension: 0.3 // Curvas más suaves
+        }
+    }
+}
     });
     
     // 2. Gráfico de torta para distribución (solo para "all")

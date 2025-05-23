@@ -154,7 +154,17 @@ function updateCharts(data, client, yearFrom, yearTo) {
             }
         }
     }
+    function adjustChartHeight() {
+    const container = document.querySelector('#evolution-container');
+    const aspectRatio = 16 / 9; // Proporción deseada (16:9)
+    const width = container.clientWidth;
+    container.style.height = `${width / aspectRatio}px`;
     
+    if (charts.evolution) {
+        charts.evolution.resize();
+    }
+}
+
   // 1. Gráfico de evolución con 3 series y UN SOLO EJE
     charts.evolution = new Chart(ctxEvolution, {
         type: 'line',

@@ -39,7 +39,7 @@ function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
 
     // Convertir a números
     yearFrom = parseInt(yearFrom);
-    monthFrom = parseInt(monthFrom) - 1; // Ajustar a índice 0-based
+    monthFrom = parseInt(monthFrom) - 1;
     yearTo = parseInt(yearTo);
     monthTo = parseInt(monthTo) - 1;
 
@@ -120,8 +120,6 @@ function updateKPIs(data) {
     document.getElementById('hired').textContent = hired;
     document.getElementById('exits').textContent = exits;
     document.getElementById('rotation').textContent = rotation;
-    
-    console.log("KPIs actualizados:", {total, hired, exits, rotation});
 }
 
 // Actualizar gráficos
@@ -134,10 +132,11 @@ function updateCharts(data, client, yearFrom, yearTo) {
     if (charts.evolution) charts.evolution.destroy();
     if (charts.distribution) charts.distribution.destroy();
     
-    // Preparar labels para el eje X (se mantiene igual)
+    // Preparar labels para el eje X
     const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const labels = [];
     
+    // Generar labels para el rango seleccionado
     if (data.totals.length <= 1) {
         const monthIndex = parseInt(document.getElementById('month-from').value) - 1;
         labels.push(`${monthLabels[monthIndex]} ${yearFrom}`);
@@ -155,7 +154,7 @@ function updateCharts(data, client, yearFrom, yearTo) {
         }
     }
     
-  // 1. Gráfico de evolución con 3 series y UN SOLO EJE
+    // 1. Gráfico de evolución con 3 series
     charts.evolution = new Chart(ctxEvolution, {
         type: 'line',
         data: {
@@ -189,73 +188,41 @@ function updateCharts(data, client, yearFrom, yearTo) {
                 }
             ]
         },
-       options: {
-    responsive: true,
-    maintainAspectRatio: false, // Crucial para control manual
-    plugins: {
-        legend: {
-            position: 'top',
-            labels: {
-                boxWidth: 12,
-                padding: 10, // Reducido
-                usePointStyle: true
-            }
-        },
-        title: {
-            display: true,
-            text: 'Evolución mensual',
-            font: { size: 14 },
-            padding: {
-                bottom: 10 // Espacio bajo título
-            }
-        }
-    },
-    layout: {
-        padding: {
-            top: 10,
-            bottom: 20,
-            left: 15,
-            right: 15
-        }
-    },
-    scales: {
-        y: {
-            beginAtZero: false,
-            title: {
-                display: true,
-                text: 'Cantidad de desarrolladores'
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Evolución mensual',
+                    font: { size: 14 }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
             },
-            // Ajustar espacio para valores bajos
-            min: function(context) {
-                const minValue = Math.min(...context.chart.data.datasets.flatMap(d => d.data));
-                return Math.max(0, minValue - 5); // Margen inferior
-            }
-        },
-        x: {
-            // Mover eje X más arriba
-            position: 'top', // Cambiado de 'bottom' a 'top'
-            ticks: {
-                padding: 10 // Espacio adicional
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Cantidad de desarrolladores'
+                    }
+                }
             }
         }
-    },
-    layout: {
-        padding: {
-            top: 20,
-            bottom: 40, // Más espacio en la parte inferior
-            left: 20,
-            right: 20
-        }
-    },
-    elements: {
-        line: {
-            tension: 0.3 // Curvas más suaves
-        }
-    }
-}
     });
     
-    // 2. Gráfico de torta para distribución (solo para "all")
+    // 2. Gráfico de torta para distribución
     if (client === "all" && data.clients && data.clientsData) {
         charts.distribution = new Chart(ctxDistribution, {
             type: 'doughnut',
@@ -294,43 +261,17 @@ function updateCharts(data, client, yearFrom, yearTo) {
                         }
                     }
                 },
-                cutout: '70%',
-                scales: {} // Sin ejes
+                cutout: '70%'
             }
         });
         document.querySelector('.chart-message').style.display = 'none';
     } else {
         document.querySelector('.chart-message').style.display = 'block';
     }
-    
-    console.log("Gráficos actualizados");
 }
 
-// Redimensionar al cambiar ventana
+// Redimensionar al cambiar tamaño de ventana
 window.addEventListener('resize', () => {
     if (charts.evolution) charts.evolution.resize();
     if (charts.distribution) charts.distribution.resize();
 });
-
-function adjustChartHeight() {
-    const container = document.querySelector('.charts-container');
-    const windowHeight = window.innerHeight;
-    const headerHeight = document.querySelector('h1').offsetHeight;
-    const filtersHeight = document.querySelector('.filters').offsetHeight;
-    const kpisHeight = document.querySelector('.kpis').offsetHeight;
-    
-    container.style.minHeight = `${windowHeight - headerHeight - filtersHeight - kpisHeight - 100}px`;
-}
-
-// Fuerza redimensionamiento después de la carga
-setTimeout(() => {
-    if (charts.evolution) {
-        charts.evolution.resize();
-    }
-    if (charts.distribution) {
-        charts.distribution.resize();
-    }
-}, 100);
-
-window.addEventListener('load', adjustChartHeight);
-window.addEventListener('resize', adjustChartHeight);

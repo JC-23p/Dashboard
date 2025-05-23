@@ -1,176 +1,104 @@
-/* Estilos generales */
+/* Estilos base */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f5f7fa;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
 }
 
 .dashboard {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 20px;
+  height: 100%;
 }
 
 /* Filtros */
 .filters {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin: 20px 0;
-    flex-wrap: wrap;
-}
-
-.filters span {
-    font-weight: bold;
-    color: #555;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 15px 0;
 }
 
 .filter-dropdown {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-    min-width: 100px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  min-width: 120px;
 }
 
-.filter-dropdown:disabled {
-    opacity: 0.7;
-    background-color: #f5f5f5;
-}
-
-/* Tarjetas KPIs */
+/* KPIs */
 .kpis {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
 }
 
 .kpi-card {
-    background: white;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    text-align: center;
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
 }
 
-.kpi-title {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 5px;
-}
-
-.kpi-value {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 10px 0;
-}
-
-.kpi-subtitle {
-    font-size: 12px;
-    color: #777;
-}
-
-/* Colores tarjetas */
-.green .kpi-value { color: #2ecc71; }
-.red .kpi-value { color: #e74c3c; }
-.orange .kpi-value { color: #f39c12; }
-
-/* ==================== */
-/* SECCIÓN DE GRÁFICOS CORREGIDA */
-/* ==================== */
-
+/* Gráficos - Versión mejorada */
 .charts-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    margin-top: 20px;
-    min-height: 400px; /* Altura mínima garantizada */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  flex: 1;
+  min-height: 400px;
 }
 
-/* Contenedores individuales */
 .chart-wrapper {
-    background: white;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-area {
+  position: relative;
+  flex: 1;
+  min-height: 300px;
+}
+
+.chartjs-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+  
+  .chart-area {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 600px) {
+  .kpis {
+    grid-template-columns: 1fr;
+  }
+  
+  .filters {
     flex-direction: column;
-    height: 100%;
-}
-
-/* Contenedor especial para gráfico de evolución */
-.evolution-container {
-    flex-grow: 1;
-    position: relative;
-    min-height: 300px;
-}
-
-/* Contenedor especial para gráfico de distribución */
-.distribution-container {
-    flex-grow: 1;
-    position: relative;
-}
-
-/* Canvas de gráficos */
-.chart-wrapper canvas {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 300px;
-}
-
-/* Mensaje de gráfico */
-.chart-message {
-    font-size: 12px;
-    color: #999;
-    text-align: center;
-    margin-top: 10px;
-    flex-shrink: 0;
-}
-
-/* Leyendas */
-.chartjs-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.chartjs-legend-item {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-}
-
-.chartjs-legend-marker {
-    width: 12px;
-    height: 12px;
-    margin-right: 5px;
-    display: inline-block;
-}
-
-/* ==================== */
-/* RESPONSIVE */
-/* ==================== */
-
-@media (max-width: 768px) {
-    .charts-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .kpis {
-        grid-template-columns: 1fr 1fr;
-    }
-    
-    .filter-dropdown {
-        width: 100%;
-    }
-    
-    .chart-wrapper {
-        height: 400px;
-    }
+    align-items: stretch;
+  }
+  
+  .filter-dropdown {
+    width: 100%;
+  }
 }

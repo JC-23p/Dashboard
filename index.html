@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="dashboard">
-        <h1>📊 Gestión de Desarrolladores</h1>
+        <h1>📊 Dashboard de Desarrolladores</h1>
         
         <!-- Filtros -->
         <div class="filters">
@@ -27,7 +27,7 @@
             </select>
     
             <select id="month-from" class="filter-dropdown">
-                <option value="1">Enero</option>
+                <option value="1" selected>Enero</option>
                 <option value="2">Febrero</option>
                 <option value="3">Marzo</option>
                 <option value="4">Abril</option>
@@ -44,8 +44,8 @@
             <span>a</span>
     
             <select id="year-to" class="filter-dropdown">
-                <option value="2024" selected>2024</option>
-                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2025" selected>2025</option>
             </select>
     
             <select id="month-to" class="filter-dropdown">
@@ -60,7 +60,7 @@
                 <option value="9">Septiembre</option>
                 <option value="10">Octubre</option>
                 <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
+                <option value="12" selected>Diciembre</option>
             </select>   
         </div>
 
@@ -73,13 +73,13 @@
             </div>
             
             <div class="kpi-card green">
-                <div class="kpi-title">📥 Ingresos (mes)</div>
+                <div class="kpi-title">📥 Altas (mes)</div>
                 <div class="kpi-value" id="hired">-</div>
                 <div class="kpi-subtitle">Nuevos o reemplazos</div>
             </div>
             
             <div class="kpi-card red">
-                <div class="kpi-title">📤 Salidas (mes)</div>
+                <div class="kpi-title">📤 Bajas (mes)</div>
                 <div class="kpi-value" id="exits">-</div>
                 <div class="kpi-subtitle">Rotación o fin de proyecto</div>
             </div>

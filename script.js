@@ -134,16 +134,14 @@ function updateCharts(data, client, yearFrom, yearTo) {
     if (charts.evolution) charts.evolution.destroy();
     if (charts.distribution) charts.distribution.destroy();
     
-    // Preparar labels para el eje X
+    // Preparar labels para el eje X (se mantiene igual)
     const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const labels = [];
     
-    // Generar labels descriptivos para el rango seleccionado
     if (data.totals.length <= 1) {
         const monthIndex = parseInt(document.getElementById('month-from').value) - 1;
         labels.push(`${monthLabels[monthIndex]} ${yearFrom}`);
     } else {
-        // Para rangos más largos, mostrar año-mes
         let currentYear = parseInt(yearFrom);
         let currentMonth = parseInt(document.getElementById('month-from').value) - 1;
         

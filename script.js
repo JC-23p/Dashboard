@@ -322,5 +322,15 @@ function adjustChartHeight() {
     container.style.minHeight = `${windowHeight - headerHeight - filtersHeight - kpisHeight - 100}px`;
 }
 
+// Fuerza redimensionamiento después de la carga
+setTimeout(() => {
+    if (charts.evolution) {
+        charts.evolution.resize();
+    }
+    if (charts.distribution) {
+        charts.distribution.resize();
+    }
+}, 100);
+
 window.addEventListener('load', adjustChartHeight);
 window.addEventListener('resize', adjustChartHeight);

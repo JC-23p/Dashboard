@@ -137,35 +137,50 @@
             </select>   
         </div>
 
-       <!-- KPIs - ACTUALIZADO con 5 KPIs -->
+       <!-- KPIs con Indicadores de Tendencia -->
         <div class="kpis">
             <div class="kpi-card">
                 <div class="kpi-title">👥 Total Activos</div>
-                <div class="kpi-value" id="total">-</div>
+                <div class="kpi-value-container">
+                    <span class="kpi-value" id="total">-</span>
+                    <span id="total-indicator" class="trend-container"></span>
+                </div>
                 <div class="kpi-subtitle">Desarrolladores actuales</div>
             </div>
             
             <div class="kpi-card green">
                 <div class="kpi-title">📥 Altas (mes)</div>
-                <div class="kpi-value" id="hired">-</div>
+                <div class="kpi-value-container">
+                    <span class="kpi-value" id="hired">-</span>
+                    <span id="hired-indicator" class="trend-container"></span>
+                </div>
                 <div class="kpi-subtitle">Nuevos o reemplazos</div>
             </div>
             
             <div class="kpi-card red">
                 <div class="kpi-title">📤 Bajas (mes)</div>
-                <div class="kpi-value" id="exits">-</div>
+                <div class="kpi-value-container">
+                    <span class="kpi-value" id="exits">-</span>
+                    <span id="exits-indicator" class="trend-container"></span>
+                </div>
                 <div class="kpi-subtitle">Rotación o fin de proyecto</div>
             </div>
             
             <div class="kpi-card orange">
                 <div class="kpi-title">🔄 Rotación Mensual</div>
-                <div class="kpi-value" id="rotation">-</div>
+                <div class="kpi-value-container">
+                    <span class="kpi-value" id="rotation">-</span>
+                    <span id="rotation-indicator" class="trend-container"></span>
+                </div>
                 <div class="kpi-subtitle">(Bajas/Promedio) × 100</div>
             </div>
             
             <div class="kpi-card purple">
                 <div class="kpi-title">📈 Rotación Anual</div>
-                <div class="kpi-value" id="annual-rotation">-</div>
+                <div class="kpi-value-container">
+                    <span class="kpi-value" id="annual-rotation">-</span>
+                    <!-- Sin indicador para rotación anual -->
+                </div>
                 <div class="kpi-subtitle">(Bajas año/Promedio año) × 100</div>
             </div>
         </div>

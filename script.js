@@ -1,3 +1,117 @@
+// NUEVA FUNCIÓN: Crear indicador de tendencia
+function createTrendIndicator(currentValue, previousValue, kpiType) {
+    // Si no hay valor anterior o son iguales, no mostrar indicador
+    if (previousValue === null || previousValue === undefined || currentValue === previousValue) {
+        return '';
+    }
+    
+    let isPositiveTrend = false;
+    
+    // Determinar si la tendencia es positiva según el tipo de KPI
+    switch (kpiType) {
+        case 'total':
+        case 'hired':
+            // Para totales y altas: subir es bueno
+            isPositiveTrend = currentValue > previousValue;
+            break;
+        case 'exits':
+        case 'rotation':
+            // Para bajas y rotación: bajar es bueno
+            isPositiveTrend = currentValue < previousValue;
+            break;
+        default:
+            return '';
+    }
+    
+    // Crear el HTML del indicador
+    if (isPositiveTrend) {
+        return `<span class="trend-indicator trend-up" title="Mejora respecto al mes anterior">▲</span>`;
+    } else {
+        return `<span class="trend-indicator trend-down" title="Empeora respecto al mes anterior">▼</span>`;
+    }
+}
+
+// NUEVA FUNCIÓN: Obtener valor del mes anterior
+function getPreviousMonthValue(data, dataType, currentIndex) {
+    if (currentIndex <= 0 || !data[dataType]) {
+        return null;
+    }
+    
+    // Buscar el valor del mes anterior (índice anterior)
+    return data[dataType][currentIndex - 1];
+}
+
+// Actualizar KPIs - MODIFICADO con indicadores de tendencia
+function updateKPIs(data, clientData, currentYear) {
+    if (data.totals.length === 0) {
+        document.getElementById('total').textContent = '-';
+        document.getElementById('hired').textContent = '-';
+        document.getElementById('exits').textContent = '-';
+        document.getElementById('rotation').textContent = '-';
+        document.getElementById('annual-rotation').textContent = '-';
+        
+        // Limpiar indicadores
+        ['total', 'hired', 'exits', 'rotation'].forEach(id => {
+            const indicator = document.getElementById(id + '-indicator');
+            if (indicator) indicator.innerHTML = '';
+        });
+        
+        return;
+    }
+
+    const lastIndex = data.totals.length - 1;
+    const total = data.totals[lastIndex];
+    const hired = data.hired[lastIndex];
+    const exits = data.exits[lastIndex];
+    
+    // Obtener valores del mes anterior
+    const prevTotal = getPreviousMonthValue(data, 'totals', lastIndex);
+    const prevHired = getPreviousMonthValue(data, 'hired', lastIndex);
+    const prevExits = getPreviousMonthValue(data, 'exits', lastIndex);
+    
+    // Calcular rotación mensual
+    let rotation = '-';
+    let rotationNumeric = null;
+    let prevRotation = null;
+    
+    if (data.totals.length > 1) {
+        const prevTotal = data.totals[lastIndex - 1] || total;
+        rotationNumeric = (exits / ((total + prevTotal) / 2)) * 100;
+        rotation = rotationNumeric.toFixed(1) + '%';
+        
+        // Calcular rotación del mes anterior si es posible
+        if (lastIndex >= 2) {
+            const prevPrevTotal = data.totals[lastIndex - 2] || prevTotal;
+            const prevExitsValue = data.exits[lastIndex - 1];
+            prevRotation = (prevExitsValue / ((prevTotal + prevPrevTotal) / 2)) * 100;
+        }
+    }
+    
+    // Calcular rotación anual
+    const annualRotation = calculateAnnualRotation(clientData, currentYear);
+    
+    // Actualizar valores
+    document.getElementById('total').textContent = total;
+    document.getElementById('hired').textContent = hired;
+    document.getElementById('exits').textContent = exits;
+    document.getElementById('rotation').textContent = rotation;
+    document.getElementById('annual-rotation').textContent = annualRotation;
+    
+    // Actualizar indicadores de tendencia
+    document.getElementById('total-indicator').innerHTML = createTrendIndicator(total, prevTotal, 'total');
+    document.getElementById('hired-indicator').innerHTML = createTrendIndicator(hired, prevHired, 'hired');
+    document.getElementById('exits-indicator').innerHTML = createTrendIndicator(exits, prevExits, 'exits');
+    document.getElementById('rotation-indicator').innerHTML = createTrendIndicator(rotationNumeric, prevRotation, 'rotation');
+    
+    console.log("KPIs actualizados con tendencias:", {
+        total: `${total} (prev: ${prevTotal})`,
+        hired: `${hired} (prev: ${prevHired})`,
+        exits: `${exits} (prev: ${prevExits})`,
+        rotation: `${rotation} (prev: ${prevRotation?.toFixed(1)}%)`,
+        annualRotation
+    });
+}
+
 // Variables globales
 let currentData = {};
 let charts = {
@@ -5,7 +119,7 @@ let charts = {
     distribution: null
 };
 
-// NUEVA FUNCIÓN: Actualizar opciones de mes según año seleccionado
+// Actualizar opciones de mes según año seleccionado
 function updateMonthOptions(yearSelectId, monthSelectId) {
     const yearSelect = document.getElementById(yearSelectId);
     const monthSelect = document.getElementById(monthSelectId);
@@ -13,9 +127,8 @@ function updateMonthOptions(yearSelectId, monthSelectId) {
     
     const today = new Date();
     const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1; // getMonth() devuelve 0-11, necesitamos 1-12
+    const currentMonth = today.getMonth() + 1;
     
-    // Definir todos los meses
     const allMonths = [
         { value: 1, name: 'Enero' },
         { value: 2, name: 'Febrero' },
@@ -31,21 +144,16 @@ function updateMonthOptions(yearSelectId, monthSelectId) {
         { value: 12, name: 'Diciembre' }
     ];
     
-    // Guardar mes seleccionado actualmente
     const currentSelectedMonth = parseInt(monthSelect.value);
-    
-    // Limpiar opciones existentes
     monthSelect.innerHTML = '';
     
-    // Determinar qué meses mostrar
     let maxMonth = 12;
     if (selectedYear === currentYear) {
-        maxMonth = currentMonth; // Solo mostrar hasta el mes actual
+        maxMonth = currentMonth;
     } else if (selectedYear > currentYear) {
-        maxMonth = 0; // No mostrar ningún mes para años futuros
+        maxMonth = 0;
     }
     
-    // Agregar opciones válidas
     for (let i = 0; i < maxMonth; i++) {
         const month = allMonths[i];
         const option = document.createElement('option');
@@ -54,19 +162,18 @@ function updateMonthOptions(yearSelectId, monthSelectId) {
         monthSelect.appendChild(option);
     }
     
-    // Restaurar selección si es válida, sino seleccionar el último mes disponible
     if (maxMonth > 0) {
         if (currentSelectedMonth <= maxMonth) {
             monthSelect.value = currentSelectedMonth;
         } else {
-            monthSelect.value = maxMonth; // Seleccionar el último mes disponible
+            monthSelect.value = maxMonth;
         }
     }
     
-    console.log(`Mes actualizado para ${selectedYear}: máximo mes ${maxMonth} (actual: ${currentMonth}/${currentYear})`);
+    console.log(`Mes actualizado para ${selectedYear}: máximo mes ${maxMonth}`);
 }
 
-// NUEVA FUNCIÓN: Actualizar opciones de año (solo mostrar años válidos)
+// Actualizar opciones de año
 function updateYearOptions() {
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -74,13 +181,9 @@ function updateYearOptions() {
     const yearFromSelect = document.getElementById('year-from');
     const yearToSelect = document.getElementById('year-to');
     
-    // Años disponibles en los datos (ajustar según tus datos)
     const availableYears = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
-    
-    // Filtrar solo años <= año actual
     const validYears = availableYears.filter(year => year <= currentYear);
     
-    // Actualizar selector "desde"
     const currentFromYear = parseInt(yearFromSelect.value);
     yearFromSelect.innerHTML = '';
     validYears.forEach(year => {
@@ -93,7 +196,6 @@ function updateYearOptions() {
         yearFromSelect.appendChild(option);
     });
     
-    // Actualizar selector "hasta"
     const currentToYear = parseInt(yearToSelect.value);
     yearToSelect.innerHTML = '';
     validYears.forEach(year => {
@@ -109,7 +211,7 @@ function updateYearOptions() {
     console.log(`Años actualizados: disponibles hasta ${currentYear}`);
 }
 
-// NUEVA FUNCIÓN: Inicializar selectores dinámicos
+// Inicializar selectores dinámicos
 function initializeDynamicSelectors() {
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -117,38 +219,30 @@ function initializeDynamicSelectors() {
     
     console.log(`Inicializando selectores dinámicos para: ${currentMonth}/${currentYear}`);
     
-    // Actualizar años válidos
     updateYearOptions();
-    
-    // Actualizar meses para ambos selectores
     updateMonthOptions('year-from', 'month-from');
     updateMonthOptions('year-to', 'month-to');
     
-    // Configurar eventos de cambio de año
     document.getElementById('year-from').addEventListener('change', () => {
         updateMonthOptions('year-from', 'month-from');
-        updateDashboard(); // Actualizar dashboard después del cambio
+        updateDashboard();
     });
     
     document.getElementById('year-to').addEventListener('change', () => {
         updateMonthOptions('year-to', 'month-to');
-        updateDashboard(); // Actualizar dashboard después del cambio
+        updateDashboard();
     });
 }
 
-// NUEVA FUNCIÓN: Calcular rotación anual
+// Calcular rotación anual
 function calculateAnnualRotation(clientData, year) {
     if (!clientData[year]) return '-';
     
-    // Sumar todas las bajas del año
     const totalExitsYear = clientData[year].exits.reduce((sum, exits) => sum + exits, 0);
-    
-    // Calcular promedio de activos del año (solo meses con datos > 0)
     const activeTotals = clientData[year].totals.filter(total => total > 0);
     if (activeTotals.length === 0) return '-';
     
     const avgActiveYear = activeTotals.reduce((sum, total) => sum + total, 0) / activeTotals.length;
-    
     if (avgActiveYear === 0) return '-';
     
     const annualRotation = (totalExitsYear / avgActiveYear) * 100;
@@ -158,7 +252,7 @@ function calculateAnnualRotation(clientData, year) {
     return annualRotation.toFixed(1) + '%';
 }
 
-// Inicialización - MODIFICADA
+// Inicialización
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         console.log("Cargando datos...");
@@ -167,15 +261,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentData = await response.json();
         console.log("Datos cargados:", currentData);
         
-        // NUEVA: Inicializar selectores dinámicos
         initializeDynamicSelectors();
         
-        // Configurar eventos (sin year-from y year-to porque ya están configurados arriba)
         ['client-filter', 'month-from', 'month-to'].forEach(id => {
             document.getElementById(id).addEventListener('change', updateDashboard);
         });
         
-        // Carga inicial
         updateDashboard();
     } catch (error) {
         console.error('Error inicial:', error);
@@ -183,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Función para filtrar por rango de fechas - SIN CAMBIOS
+// Función para filtrar por rango de fechas
 function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
     const result = {
         totals: [],
@@ -193,19 +284,16 @@ function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
         clientsData: []
     };
 
-    // Convertir a números
     yearFrom = parseInt(yearFrom);
     monthFrom = parseInt(monthFrom) - 1;
     yearTo = parseInt(yearTo);
     monthTo = parseInt(monthTo) - 1;
 
-    // Validar rango básico (ya no necesitamos validar fechas futuras)
     if (yearFrom > yearTo || (yearFrom === yearTo && monthFrom > monthTo)) {
         alert("La fecha de inicio debe ser anterior o igual a la fecha final");
         return result;
     }
 
-    // Iterar por cada año y mes en el rango
     for (let year = yearFrom; year <= yearTo; year++) {
         if (!clientData[year]) continue;
         
@@ -228,7 +316,7 @@ function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
     return result;
 }
 
-// Actualizar dashboard completo - SIMPLIFICADO (sin validación manual)
+// Actualizar dashboard completo
 function updateDashboard() {
     try {
         const client = document.getElementById('client-filter').value;
@@ -254,43 +342,7 @@ function updateDashboard() {
     }
 }
 
-// Actualizar KPIs - CON ROTACIÓN ANUAL
-function updateKPIs(data, clientData, currentYear) {
-    if (data.totals.length === 0) {
-        document.getElementById('total').textContent = '-';
-        document.getElementById('hired').textContent = '-';
-        document.getElementById('exits').textContent = '-';
-        document.getElementById('rotation').textContent = '-';
-        document.getElementById('annual-rotation').textContent = '-';
-        return;
-    }
-
-    const lastIndex = data.totals.length - 1;
-    const total = data.totals[lastIndex];
-    const hired = data.hired[lastIndex];
-    const exits = data.exits[lastIndex];
-    
-    // Calcular rotación mensual
-    let rotation = '-';
-    if (data.totals.length > 1) {
-        const prevTotal = data.totals[lastIndex - 1] || total;
-        rotation = ((exits / ((total + prevTotal) / 2)) * 100).toFixed(1) + '%';
-    }
-    
-    // Calcular rotación anual
-    const annualRotation = calculateAnnualRotation(clientData, currentYear);
-    
-    // Actualizar DOM
-    document.getElementById('total').textContent = total;
-    document.getElementById('hired').textContent = hired;
-    document.getElementById('exits').textContent = exits;
-    document.getElementById('rotation').textContent = rotation;
-    document.getElementById('annual-rotation').textContent = annualRotation;
-    
-    console.log("KPIs actualizados:", {total, hired, exits, rotation, annualRotation});
-}
-
-// Calcular distribución dinámicamente - SIN CAMBIOS
+// Calcular distribución dinámicamente
 function calculateDistributionForMonth(year, month) {
     if (!currentData.equifax || !currentData.honeywell) {
         console.warn("No se encontraron datos de equifax o honeywell");
@@ -305,13 +357,12 @@ function calculateDistributionForMonth(year, month) {
     return [equifaxTotal, honeywellTotal];
 }
 
-// Actualizar gráficos - SIN CAMBIOS
+// Actualizar gráficos
 function updateCharts(data, client, yearFrom, yearTo, monthTo) {
     console.log("Actualizando gráficos...");
     const ctxEvolution = document.getElementById('evolution-chart');
     const ctxDistribution = document.getElementById('distribution-chart');
     
-    // Destruir gráficos existentes
     if (charts.evolution && typeof charts.evolution.destroy === 'function') {
         charts.evolution.destroy();
         charts.evolution = null;
@@ -321,11 +372,9 @@ function updateCharts(data, client, yearFrom, yearTo, monthTo) {
         charts.distribution = null;
     }
     
-    // Limpiar canvas
     ctxEvolution.width = ctxEvolution.offsetWidth;
     ctxEvolution.height = ctxEvolution.offsetHeight;
     
-    // Preparar labels para el eje X
     const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const labels = [];
     
@@ -346,7 +395,6 @@ function updateCharts(data, client, yearFrom, yearTo, monthTo) {
         }
     }
 
-    // Gráfico de evolución
     charts.evolution = new Chart(ctxEvolution, {
         type: 'line',
         data: {
@@ -397,7 +445,6 @@ function updateCharts(data, client, yearFrom, yearTo, monthTo) {
         }
     });
     
-    // Gráfico de distribución (solo para "all")
     if (client === "all" && data.clients) {
         const finalYear = parseInt(yearTo);
         const finalMonth = parseInt(monthTo) - 1;
@@ -446,7 +493,6 @@ function updateCharts(data, client, yearFrom, yearTo, monthTo) {
     console.log("Gráficos actualizados");
 }
 
-// Redimensionar al cambiar ventana
 window.addEventListener('resize', () => {
     if (charts.evolution) charts.evolution.resize();
     if (charts.distribution) charts.distribution.resize();

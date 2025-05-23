@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Bajas - 23People</title>
+    <style>
+        /* Estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2E86AB 0%, #1a5d7a 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .main-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-stat {
+            text-align: center;
+        }
+
+        .header-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            padding: 20px 30px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 250px;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2E86AB;
+            box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .results-info {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Tabla */
+        .table-container {
+            overflow-x: auto;
+            margin: 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background: #f1f5f9;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th:first-child {
+            padding-left: 30px;
+        }
+
+        .data-table th:last-child {
+            padding-right: 30px;
+        }
+
+        .data-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .data-table td:first-child {
+            padding-left: 30px;
+        }
+
+        .data-table td:last-child {
+            padding-right: 30px;
+        }
+
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Badges y etiquetas */
+        .client-badge {
+            background: linear-gradient(135deg, #2E86AB 0%, #1a5d7a 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .motivo-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .motivo-fin-proyecto {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .motivo-renuncia {
+            background: rgba(255, 193, 7, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .motivo-termino-contrato {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+
+        .percentage-cell {
+            text-align: center;
+            font-weight: 600;
+            color: #e74c3c;
+        }
+
+        .permanencia-cell {
+            text-align: center;
+        }
+
+        .permanencia-badge {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-message {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Paginación */
+        .pagination {
+            padding: 20px 30px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .pagination-info {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e0;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            border-color: #2E86AB;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background: #2E86AB;
+            color: white;
+            border-color: #2E86AB;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-stats {
+                gap: 20px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-input {
+                flex: 1;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .toolbar {
+                padding: 15px 20px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+            }
+
+            .data-table th:first-child,
+            .data-table td:first-child {
+                padding-left: 20px;
+            }
+
+            .data-table th:last-child,
+            .data-table td:last-child {
+                padding-right: 20px;
+            }
+
+            .main-title {
+                font-size: 20px;
+            }
+
+            .header-stats {
+                width: 100%;
+                justify-content: space-between;
+                gap: 15px;
+            }
+        }
+
+        /* Ordenamiento */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .sortable:hover {
+            background: #e2e8f0;
+        }
+
+        .sortable::after {
+            content: '↕';
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+
+        .sortable.asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        .sortable.desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="javascript:history.back()" class="back-button">
+                    ← Volver
+                </a>
+                <div class="header-title">
+                    <h1 class="main-title" id="page-title">Detalle de Bajas Mensual - Mayo 2025</h1>
+                    <p class="subtitle">Listado completo de colaboradores que causaron baja</p>
+                </div>
+            </div>
+            
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value" id="total-bajas">8</div>
+                    <div class="header-stat-label">Total Bajas</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value" id="promedio-permanencia">12.3</div>
+                    <div class="header-stat-label">Promedio Meses</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar por cliente, motivo o razón...">
+                <select id="motivo-filter" class="filter-select">
+                    <option value="">Todos los motivos</option>
+                    <option value="fin-proyecto">Fin de proyecto</option>
+                    <option value="renuncia">Renuncia voluntaria</option>
+                    <option value="termino-contrato">Término de contrato</option>
+                </select>
+            </div>
+            <div class="results-info">
+                <span id="results-count">Mostrando 8 de 8 registros</span>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="data-table" id="data-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-column="cliente">Cliente</th>
+                        <th class="sortable" data-column="motivo">Motivo Salida</th>
+                        <th class="sortable" data-column="razon">Razón Detallada</th>
+                        <th class="sortable" data-column="permanencia">Permanencia</th>
+                        <th class="sortable" data-column="porcentaje">% del Total</th>
+                        <th>ID Empleado</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Los datos se cargarán via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination">
+            <div class="pagination-info" id="pagination-info">
+                Mostrando 1-8 de 8 registros
+            </div>
+            <div class="pagination-controls" id="pagination-controls">
+                <!-- Los controles se generarán via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos estáticos de ejemplo (simulando múltiples bajas)
+        const bajasData = {
+            mes: 'Mayo',
+            ano: 2025,
+            empleados: [
+                {
+                    id: 'EMP001',
+                    cliente: 'Honeywell Chile',
+                    motivoSalida: 'fin-proyecto',
+                    motivoTexto: 'Fin de proyecto',
+                    razonSalida: 'Finalización del proyecto de automatización industrial',
+                    permanenciaMeses: 3,
+                    porcentaje: 12.5
+                },
+                {
+                    id: 'EMP002',
+                    cliente: 'Equifax',
+                    motivoSalida: 'renuncia',
+                    motivoTexto: 'Renuncia voluntaria',
+                    razonSalida: 'Mejor oferta laboral en otra empresa',
+                    permanenciaMeses: 18,
+                    porcentaje: 12.5
+                },
+                {
+                    id: 'EMP003',
+                    cliente: 'Equifax',
+                    motivoSalida: 'fin-proyecto',
+                    motivoTexto: 'Fin de proyecto',
+                    razonSalida: 'Proyecto de migración de datos completado',
+                    permanenciaMeses: 8,
+                    porcentaje: 12.5
+                },
+                {
+                    id: 'EMP004',
+                    cliente: 'Equifax',
+                    motivoSalida: 'termino-contrato',
+                    motivoTexto: 'Término de contrato',
+                    razonSalida: 'Vencimiento de contrato temporal',
+                    permanenciaMeses: 6,
+                    porcentaje: 12.5
+                },
+                {
+                    id: 'EMP005',
+                    cliente: 'Equifax',
+                    motivoSalida: 'renuncia',
+                    motivoTexto: 'Renuncia voluntaria',
+                    razonSalida: 'Cambio de ciudad por motivos personales',
+                    permanenciaMeses: 24,
+                    porcentaje: 12.5
+                },
+                {
+                    id: 'EMP006',
+                    cliente: 'Equifax',
+                    motivoSalida: 'fin-proyecto',
+                    motivoTexto: 'Fin de proyecto',
+                    razonSalida: 'Implementación de sistema CRM finalizada',
+                    permanenciaMeses: 15,
+                    porcentaje: 12.5
+                },
+                {
+                    id: 'EMP007',
+                    cliente: 'Honeywell Chile',
+                    motivoSalida: 'renuncia',
+                    motivoTexto: 'Renuncia voluntaria',
+                    razonSalida: 'Decisión de emprender negocio propio',
+                    permanenciaMeses: 9,
+                    porcentaje: 12.5
+                },
+                {
+                    id: 'EMP008',
+                    cliente: 'Equifax',
+                    motivoSalida: 'termino-contrato',
+                    motivoTexto: 'Término de contrato',
+                    razonSalida: 'Reducción de equipo por reestructuración',
+                    permanenciaMeses: 4,
+                    porcentaje: 12.5
+                }
+            ]
+        };
+
+        // Estado de la aplicación
+        let filteredData = [...bajasData.empleados];
+        let currentSort = { column: null, direction: null };
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // Funciones de utilidad
+        function getMonthName(monthNumber) {
+            const months = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            return months[monthNumber - 1] || 'Enero';
+        }
+
+        function getMotivoBadgeClass(motivo) {
+            const classes = {
+                'fin-proyecto': 'motivo-fin-proyecto',
+                'renuncia': 'motivo-renuncia',
+                'termino-contrato': 'motivo-termino-contrato'
+            };
+            return classes[motivo] || 'motivo-fin-proyecto';
+        }
+
+        // Actualizar título y estadísticas
+        function updatePageInfo() {
+            const params = getUrlParams();
+            if (params.mes !== bajasData.mes || params.ano !== bajasData.ano) {
+                bajasData.mes = getMonthName(parseInt(params.mes)) || bajasData.mes;
+                bajasData.ano = params.ano;
+            }
+
+            const title = `Detalle de Bajas Mensual - ${bajasData.mes} ${bajasData.ano}`;
+            document.getElementById('page-title').textContent = title;
+            document.title = `${title} - 23People`;
+
+            document.getElementById('total-bajas').textContent = bajasData.empleados.length;
+            
+            const promedioMeses = bajasData.empleados.reduce((sum, emp) => sum + emp.permanenciaMeses, 0) / bajasData.empleados.length;
+            document.getElementById('promedio-permanencia').textContent = promedioMeses.toFixed(1);
+        }
+
+        // Filtrar datos
+        function filterData() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const motivoFilter = document.getElementById('motivo-filter').value;
+
+            filteredData = bajasData.empleados.filter(empleado => {
+                const matchesSearch = !searchTerm || 
+                    empleado.cliente.toLowerCase().includes(searchTerm) ||
+                    empleado.motivoTexto.toLowerCase().includes(searchTerm) ||
+                    empleado.razonSalida.toLowerCase().includes(searchTerm) ||
+                    empleado.id.toLowerCase().includes(searchTerm);
+
+                const matchesMotivo = !motivoFilter || empleado.motivoSalida === motivoFilter;
+
+                return matchesSearch && matchesMotivo;
+            });
+
+            currentPage = 1;
+            renderTable();
+            updateResultsInfo();
+        }
+
+        // Ordenar datos
+        function sortData(column) {
+            let direction = 'asc';
+            
+            if (currentSort.column === column && currentSort.direction === 'asc') {
+                direction = 'desc';
+            }
+
+            currentSort = { column, direction };
+
+            filteredData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+
+                // Manejo especial para números
+                if (column === 'permanenciaMeses' || column === 'porcentaje') {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+
+                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            updateSortHeaders();
+            renderTable();
+        }
+
+        // Actualizar headers de ordenamiento
+        function updateSortHeaders() {
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.classList.remove('asc', 'desc');
+                if (header.dataset.column === currentSort.column) {
+                    header.classList.add(currentSort.direction);
+                }
+            });
+        }
+
+        // Renderizar tabla
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <div class="empty-state-title">No se encontraron resultados</div>
+                                <div class="empty-state-message">Intenta ajustar los filtros de búsqueda</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = pageData.map(empleado => `
+                <tr>
+                    <td>
+                        <div class="client-badge">${empleado.cliente}</div>
+                    </td>
+                    <td>
+                        <span class="motivo-badge ${getMotivoBadgeClass(empleado.motivoSalida)}">
+                            ${empleado.motivoTexto}
+                        </span>
+                    </td>
+                    <td style="max-width: 300px;">
+                        ${empleado.razonSalida}
+                    </td>
+                    <td class="permanencia-cell">
+                        <span class="permanencia-badge">${empleado.permanenciaMeses} meses</span>
+                    </td>
+                    <td class="percentage-cell">
+                        ${empleado.porcentaje}%
+                    </td>
+                    <td style="font-family: monospace; color: #64748b;">
+                        ${empleado.id}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Actualizar información de resultados
+        function updateResultsInfo() {
+            const total = filteredData.length;
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(start + itemsPerPage - 1, total);
+
+            document.getElementById('results-count').textContent = 
+                `Mostrando ${total} de ${bajasData.empleados.length} registros`;
+            
+            document.getElementById('pagination-info').textContent = 
+                total > 0 ? `Mostrando ${start}-${end} de ${total} registros` : 'No hay registros para mostrar';
+
+            updatePaginationControls();
+        }
+
+        // Actualizar controles de paginación
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const controls = document.getElementById('pagination-controls');
+
+            if (totalPages <= 1) {
+                controls.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+                    Anterior
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `
+                        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += '<span style="padding: 6px;">...</span>';
+                }
+            }
+
+            html += `
+                <button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+                    Siguiente
+                </button>
+            `;
+
+            controls.innerHTML = html;
+        }
+
+        // Cambiar página
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+                updateResultsInfo();
+            }
+        }
+
+        // Obtener parámetros URL
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                mes: params.get('mes') || bajasData.mes,
+                ano: parseInt(params.get('ano')) || bajasData.ano,
+                cliente: params.get('cliente') || 'all'
+            };
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePageInfo();
+            renderTable();
+            updateResultsInfo();
+
+            // Búsqueda en tiempo real
+            document.getElementById('search-input').addEventListener('input', filterData);
+            document.getElementById('motivo-filter').addEventListener('change', filterData);
+
+            // Ordenamiento por columnas
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', () => {
+                    sortData(header.dataset.column);
+                });
+            });
+
+            console.log('Página de detalle de bajas cargada:', bajasData);
+        });
+    </script>
+</body>
+</html>

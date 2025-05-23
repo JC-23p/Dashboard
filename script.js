@@ -216,6 +216,40 @@ function updateCharts(data, client, yearFrom, yearTo) {
                 }
             ]
         },
+        options: {
+    responsive: true,
+    maintainAspectRatio: false, // ¡Importante! Permite ajustar altura libremente
+    plugins: {
+        legend: {
+            position: 'top',
+        },
+        title: {
+            display: true,
+            text: 'Evolución mensual'
+        }
+    },
+    layout: {
+        padding: {
+            top: 10,
+            bottom: 20,
+            left: 10,
+            right: 10
+        }
+    },
+    scales: {
+        y: {
+            beginAtZero: false,
+            grid: {
+                display: true
+            }
+        },
+        x: {
+            grid: {
+                display: false
+            }
+        }
+    }
+}
         
     });
     

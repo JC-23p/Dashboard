@@ -32,10 +32,10 @@ body {
     background-color: #f5f5f5;
 }
 
-/* Tarjetas KPIs */
+/* Tarjetas KPIs - ACTUALIZADO para 5 KPIs */
 .kpis {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px;
     margin-bottom: 20px;
 }
@@ -65,10 +65,11 @@ body {
     color: #777;
 }
 
-/* Colores tarjetas */
+/* Colores tarjetas - AGREGADO COLOR PÚRPURA */
 .green .kpi-value { color: #2ecc71; }
 .red .kpi-value { color: #e74c3c; }
 .orange .kpi-value { color: #f39c12; }
+.purple .kpi-value { color: #8e44ad; }
 
 /* Gráficos */
 

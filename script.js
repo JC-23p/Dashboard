@@ -79,7 +79,29 @@ function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
     return result;
 }
 
-// Actualizar dashboard completo
+// NUEVA FUNCIÓN: Calcular rotación anual
+function calculateAnnualRotation(clientData, year) {
+    if (!clientData[year]) return '-';
+    
+    // Sumar todas las bajas del año
+    const totalExitsYear = clientData[year].exits.reduce((sum, exits) => sum + exits, 0);
+    
+    // Calcular promedio de activos del año (solo meses con datos > 0)
+    const activeTotals = clientData[year].totals.filter(total => total > 0);
+    if (activeTotals.length === 0) return '-';
+    
+    const avgActiveYear = activeTotals.reduce((sum, total) => sum + total, 0) / activeTotals.length;
+    
+    if (avgActiveYear === 0) return '-';
+    
+    const annualRotation = (totalExitsYear / avgActiveYear) * 100;
+    
+    console.log(`Rotación anual ${year}: ${totalExitsYear} bajas / ${avgActiveYear.toFixed(1)} promedio = ${annualRotation.toFixed(1)}%`);
+    
+    return annualRotation.toFixed(1) + '%';
+}
+
+// Actualizar dashboard completo - MODIFICADO para pasar año
 function updateDashboard() {
     try {
         const client = document.getElementById('client-filter').value;
@@ -97,7 +119,7 @@ function updateDashboard() {
         const filteredData = filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo);
         
         console.log("Datos finales:", filteredData);
-        updateKPIs(filteredData);
+        updateKPIs(filteredData, clientData, yearTo); // PASAR clientData y año
         updateCharts(filteredData, client, yearFrom, yearTo, monthTo);
         
     } catch (error) {
@@ -105,13 +127,14 @@ function updateDashboard() {
     }
 }
 
-// Actualizar KPIs
-function updateKPIs(data) {
+// Actualizar KPIs - MODIFICADO para incluir rotación anual
+function updateKPIs(data, clientData, currentYear) {
     if (data.totals.length === 0) {
         document.getElementById('total').textContent = '-';
         document.getElementById('hired').textContent = '-';
         document.getElementById('exits').textContent = '-';
         document.getElementById('rotation').textContent = '-';
+        document.getElementById('annual-rotation').textContent = '-';
         return;
     }
 
@@ -120,20 +143,24 @@ function updateKPIs(data) {
     const hired = data.hired[lastIndex];
     const exits = data.exits[lastIndex];
     
-    // Calcular rotación
+    // Calcular rotación mensual (EXISTENTE - sin cambios)
     let rotation = '-';
     if (data.totals.length > 1) {
         const prevTotal = data.totals[lastIndex - 1] || total;
         rotation = ((exits / ((total + prevTotal) / 2)) * 100).toFixed(1) + '%';
     }
     
-    // Actualizar DOM
+    // Calcular rotación anual (NUEVA)
+    const annualRotation = calculateAnnualRotation(clientData, currentYear);
+    
+    // Actualizar DOM - AGREGADO annual-rotation
     document.getElementById('total').textContent = total;
     document.getElementById('hired').textContent = hired;
     document.getElementById('exits').textContent = exits;
     document.getElementById('rotation').textContent = rotation;
+    document.getElementById('annual-rotation').textContent = annualRotation;
     
-    console.log("KPIs actualizados:", {total, hired, exits, rotation});
+    console.log("KPIs actualizados:", {total, hired, exits, rotation, annualRotation});
 }
 
 // FUNCIÓN NUEVA: Calcular distribución dinámicamente
@@ -150,6 +177,8 @@ function calculateDistributionForMonth(year, month) {
     
     return [equifaxTotal, honeywellTotal];
 }
+
+
 
 // Actualizar gráficos - MODIFICADO
 function updateCharts(data, client, yearFrom, yearTo, monthTo) {

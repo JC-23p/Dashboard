@@ -129,7 +129,8 @@ function updateCharts(data, client, yearFrom, yearTo) {
     console.log("Actualizando gráficos...");
     const ctxEvolution = document.getElementById('evolution-chart');
     const ctxDistribution = document.getElementById('distribution-chart');
-    
+    console.log("Datos para gráfico:", data); // Verifica que los datos lleguen bien
+
     // Destruir gráficos existentes
     if (charts.evolution) charts.evolution.destroy();
     if (charts.distribution) charts.distribution.destroy();

@@ -189,26 +189,33 @@ function updateCharts(data, client, yearFrom, yearTo) {
                 }
             ]
         },
-        options: {
+       options: {
     responsive: true,
-    maintainAspectRatio: false, // Importante para control manual
+    maintainAspectRatio: false, // Crucial para control manual
     plugins: {
         legend: {
             position: 'top',
             labels: {
                 boxWidth: 12,
-                padding: 20,
+                padding: 10, // Reducido
                 usePointStyle: true
             }
         },
         title: {
             display: true,
             text: 'Evolución mensual',
-            font: { size: 14 }
-        },
-        tooltip: {
-            mode: 'index',
-            intersect: false
+            font: { size: 14 },
+            padding: {
+                bottom: 10 // Espacio bajo título
+            }
+        }
+    },
+    layout: {
+        padding: {
+            top: 10,
+            bottom: 20,
+            left: 15,
+            right: 15
         }
     },
     scales: {

@@ -9,7 +9,12 @@ body {
 .dashboard {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
+
 
 /* Filtros */
 .filters {
@@ -77,40 +82,40 @@ body {
 .orange .kpi-value { color: #f39c12; }
 
 /* Gráficos */
-/* Ajustar altura de los contenedores */
+/* Contenedor de gráficos */
 .charts-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 25px;
     margin-top: 20px;
-    min-height: 60vh; /* Nueva altura mínima */
+    height: 500px; /* Altura fija */
 }
 
+/* Contenedor individual de gráficos */
 .chart-wrapper {
     background: white;
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    height: 100%; /* Ocupa todo el espacio disponible */
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    height: 100%;
 }
 
+/* Canvas de gráficos */
 .chart-wrapper canvas {
-    flex-grow: 1; /* El canvas ocupa todo el espacio restante */
-    min-height: 300px;
-    width: 100% !important; /* Fuerza el ancho completo */
+    width: 100% !important;
+    height: calc(100% - 30px) !important; /* Resta espacio para títulos */
 }
 
-/* Ajustar responsive para móviles */
+/* Responsive para móviles */
 @media (max-width: 768px) {
     .charts-container {
         grid-template-columns: 1fr;
-        min-height: auto;
+        height: auto;
     }
     
     .chart-wrapper {
-        height: 400px; /* Altura fija en móviles */
+        height: 400px;
     }
 }
 

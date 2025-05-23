@@ -92,16 +92,20 @@
         </div>
 
         <!-- Gráficos -->
-        <div class="charts-container">
-    <div class="chart-wrapper" style="position: relative;">
-        <canvas id="evolution-chart"></canvas>
+       <div class="charts-container">
+    <div class="chart-wrapper">
+        <div class="chart-area">
+            <canvas id="evolution-chart"></canvas>
+        </div>
     </div>
-    <div class="chart-wrapper" style="position: relative;">
-        <canvas id="distribution-chart"></canvas>
-        <p class="chart-message">* Distribución por cliente solo disponible en vista general</p>
+    <div class="chart-wrapper">
+        <div class="chart-area">
+            <canvas id="distribution-chart"></canvas>
+            <p class="chart-message">* Distribución por cliente solo disponible en vista general</p>
+        </div>
     </div>
 </div>
-    </div>
+
 
     <script src="script.js"></script>
 </body>

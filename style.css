@@ -97,7 +97,7 @@ body {
 }
 
 #evolution-container {
-    height: 500px; /* Altura fija (ajusta este valor) */
+    height: 700px; /* Altura fija (ajusta este valor) */
     width: 100%;
     min-height: 0; /* Elimina restricciones mínimas si las hay */
 }

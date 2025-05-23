@@ -153,6 +153,43 @@ function updateCharts(data, client, yearFrom, yearTo) {
             }
         }
     }
+    // En la función updateCharts, modifica las opciones del gráfico evolutivo:
+charts.evolution = new Chart(ctxEvolution, {
+    type: 'line',
+    data: { /* ... tus datos ... */ },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: {
+                top: 20,
+                bottom: 30,
+                left: 20,
+                right: 20
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                ticks: {
+                    precision: 0
+                }
+            },
+            x: {
+                ticks: {
+                    autoSkip: false,
+                    maxRotation: 45,
+                    minRotation: 45
+                }
+            }
+        }
+    }
+});
     
     // 1. Gráfico de evolución con 3 series
     charts.evolution = new Chart(ctxEvolution, {
@@ -270,8 +307,18 @@ function updateCharts(data, client, yearFrom, yearTo) {
     }
 }
 
-// Redimensionar al cambiar tamaño de ventana
-window.addEventListener('resize', () => {
-    if (charts.evolution) charts.evolution.resize();
-    if (charts.distribution) charts.distribution.resize();
-});
+// Función para ajustar dinámicamente la altura
+function adjustChartHeight() {
+    const container = document.querySelector('#evolution-container');
+    const aspectRatio = 16 / 9; // Proporción deseada
+    const width = container.clientWidth;
+    container.style.height = `${width / aspectRatio}px`;
+    
+    if (charts.evolution) {
+        charts.evolution.resize();
+    }
+}
+
+// Ejecutar al cargar y al redimensionar
+window.addEventListener('load', adjustChartHeight);
+window.addEventListener('resize', adjustChartHeight);

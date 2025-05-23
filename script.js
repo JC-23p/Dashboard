@@ -188,3 +188,46 @@ window.addEventListener('resize', () => {
     if (charts.evolution) charts.evolution.resize();
     if (charts.distribution) charts.distribution.resize();
 });
+
+function filterByDateRange(data, yearFrom, monthFrom, yearTo, monthTo) {
+    const result = {
+        totals: [],
+        hired: [],
+        exits: [],
+        clients: data.clients,
+        clientsData: data.clientsData
+    };
+
+    // Convertir fechas a índices
+    const startIndex = (parseInt(yearFrom) - 2023) * 12 + parseInt(monthFrom);
+    const endIndex = (parseInt(yearTo) - 2023) * 12 + parseInt(monthTo);
+
+    // Filtrar datos
+    for (let year in data) {
+        for (let month = 0; month < 12; month++) {
+            const currentIndex = (parseInt(year) - 2023) * 12 + month;
+            if (currentIndex >= startIndex && currentIndex <= endIndex) {
+                if (data[year].totals[month] !== undefined) {
+                    result.totals.push(data[year].totals[month]);
+                    result.hired.push(data[year].hired[month]);
+                    result.exits.push(data[year].exits[month]);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+function updateDashboard() {
+    const client = document.getElementById('client-filter').value;
+    const yearFrom = document.getElementById('year-from').value;
+    const monthFrom = document.getElementById('month-from').value;
+    const yearTo = document.getElementById('year-to').value;
+    const monthTo = document.getElementById('month-to').value;
+
+    const filteredData = filterByDateRange(currentData[client], yearFrom, monthFrom, yearTo, monthTo);
+    
+    updateKPIs(filteredData);
+    updateCharts(filteredData, client, yearFrom, yearTo);
+}

@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentData = await response.json();
         console.log("Datos cargados:", currentData);
         
+        // Remover listeners antiguos (si existen) antes de agregar nuevos
+        ['client-filter', 'year-from', 'month-from', 'year-to', 'month-to'].forEach(id => {
+            const element = document.getElementById(id);
+            element.removeEventListener('change', updateDashboard); // Limpiar primero
+            element.addEventListener('change', updateDashboard);
+        });
         // Configurar eventos
         ['client-filter', 'year-from', 'month-from', 'year-to', 'month-to'].forEach(id => {
             document.getElementById(id).addEventListener('change', updateDashboard);
@@ -77,6 +83,7 @@ function updateDashboard() {
         const yearTo = document.getElementById('year-to').value;
         const monthTo = document.getElementById('month-to').value;
 
+        console.log("Ejecutando updateDashboard...");
         console.log(`Filtrando por: ${client}, ${yearFrom}-${monthFrom} a ${yearTo}-${monthTo}`);
         
         const clientData = currentData[client];
@@ -89,7 +96,7 @@ function updateDashboard() {
         updateCharts(filteredData, client, yearFrom, yearTo);
         
     } catch (error) {
-        console.error('Error en updateDashboard:', error);
+        console.error('Error en updateDashboard:', error, error.stack);
     }
 }
 
@@ -129,11 +136,20 @@ function updateCharts(data, client, yearFrom, yearTo) {
     console.log("Actualizando gráficos...");
     const ctxEvolution = document.getElementById('evolution-chart');
     const ctxDistribution = document.getElementById('distribution-chart');
-    console.log("Datos para gráfico:", data); // Verifica que los datos lleguen bien
-
-    // Destruir gráficos existentes
-    if (charts.evolution) charts.evolution.destroy();
-    if (charts.distribution) charts.distribution.destroy();
+    
+    // Destruir gráficos existentes CON VALIDACIÓN
+    if (charts.evolution && typeof charts.evolution.destroy === 'function') {
+        charts.evolution.destroy();
+        charts.evolution = null;
+    }
+    if (charts.distribution && typeof charts.distribution.destroy === 'function') {
+        charts.distribution.destroy();
+        charts.distribution = null;
+    }
+    
+    // Limpiar el canvas (opcional pero recomendado)
+    ctxEvolution.width = ctxEvolution.offsetWidth;
+    ctxEvolution.height = ctxEvolution.offsetHeight;
     
     // Preparar labels para el eje X (se mantiene igual)
     const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];

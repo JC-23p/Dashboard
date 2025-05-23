@@ -40,7 +40,7 @@ function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
         hired: [],
         exits: [],
         clients: clientData[yearFrom]?.clients || [],
-        clientsData: clientData[yearFrom]?.clientsData || []
+        clientsData: [] // Se calculará dinámicamente
     };
 
     // Convertir a números
@@ -67,6 +67,11 @@ function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
                 result.totals.push(clientData[year].totals[month]);
                 result.hired.push(clientData[year].hired[month]);
                 result.exits.push(clientData[year].exits[month]);
+                
+                // NUEVA LÓGICA: Agregar distribución por mes si existe
+                if (clientData[year].clientsData && clientData[year].clientsData[month]) {
+                    result.clientsData.push(clientData[year].clientsData[month]);
+                }
             }
         }
     }
@@ -93,7 +98,7 @@ function updateDashboard() {
         
         console.log("Datos finales:", filteredData);
         updateKPIs(filteredData);
-        updateCharts(filteredData, client, yearFrom, yearTo);
+        updateCharts(filteredData, client, yearFrom, yearTo, monthTo);
         
     } catch (error) {
         console.error('Error en updateDashboard:', error, error.stack);
@@ -131,8 +136,23 @@ function updateKPIs(data) {
     console.log("KPIs actualizados:", {total, hired, exits, rotation});
 }
 
-// Actualizar gráficos
-function updateCharts(data, client, yearFrom, yearTo) {
+// FUNCIÓN NUEVA: Calcular distribución dinámicamente
+function calculateDistributionForMonth(year, month) {
+    if (!currentData.equifax || !currentData.honeywell) {
+        console.warn("No se encontraron datos de equifax o honeywell");
+        return [0, 0];
+    }
+    
+    const equifaxTotal = currentData.equifax[year]?.totals[month] || 0;
+    const honeywellTotal = currentData.honeywell[year]?.totals[month] || 0;
+    
+    console.log(`Distribución ${year}-${month + 1}: Equifax=${equifaxTotal}, Honeywell=${honeywellTotal}`);
+    
+    return [equifaxTotal, honeywellTotal];
+}
+
+// Actualizar gráficos - MODIFICADO
+function updateCharts(data, client, yearFrom, yearTo, monthTo) {
     console.log("Actualizando gráficos...");
     const ctxEvolution = document.getElementById('evolution-chart');
     const ctxDistribution = document.getElementById('distribution-chart');
@@ -171,18 +191,19 @@ function updateCharts(data, client, yearFrom, yearTo) {
             }
         }
     }
-    function adjustChartHeight() {
-    const container = document.querySelector('#evolution-container');
-    const aspectRatio = 16 / 9; // Proporción deseada (16:9)
-    const width = container.clientWidth;
-    container.style.height = `${width / aspectRatio}px`;
     
-    if (charts.evolution) {
-        charts.evolution.resize();
+    function adjustChartHeight() {
+        const container = document.querySelector('#evolution-container');
+        const aspectRatio = 16 / 9; // Proporción deseada (16:9)
+        const width = container.clientWidth;
+        container.style.height = `${width / aspectRatio}px`;
+        
+        if (charts.evolution) {
+            charts.evolution.resize();
+        }
     }
-}
 
-  // 1. Gráfico de evolución con 3 series y UN SOLO EJE
+    // 1. Gráfico de evolución con 3 series y UN SOLO EJE
     charts.evolution = new Chart(ctxEvolution, {
         type: 'line',
         data: {
@@ -217,50 +238,57 @@ function updateCharts(data, client, yearFrom, yearTo) {
             ]
         },
         options: {
-    responsive: true,
-    maintainAspectRatio: false, // ¡Importante! Permite ajustar altura libremente
-    plugins: {
-        legend: {
-            position: 'top',
-        },
-        title: {
-            display: true,
-            text: 'Evolución mensual'
-        }
-    },
-    layout: {
-        padding: {
-            top: 10,
-            bottom: 20,
-            left: 10,
-            right: 10
-        }
-    },
-    scales: {
-        y: {
-            beginAtZero: false,
-            grid: {
-                display: true
+            responsive: true,
+            maintainAspectRatio: false, // ¡Importante! Permite ajustar altura libremente
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Evolución mensual'
+                }
+            },
+            layout: {
+                padding: {
+                    top: 10,
+                    bottom: 20,
+                    left: 10,
+                    right: 10
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: {
+                        display: true
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
             }
-        },
-        x: {
-            grid: {
-                display: false
-            }
         }
-    }
-}
-        
     });
     
-    // 2. Gráfico de torta para distribución (solo para "all")
-    if (client === "all" && data.clients && data.clientsData) {
+    // 2. Gráfico de torta para distribución (solo para "all") - MODIFICADO
+    if (client === "all" && data.clients) {
+        // CALCULAR DISTRIBUCIÓN DINÁMICAMENTE PARA EL MES FINAL
+        const finalYear = parseInt(yearTo);
+        const finalMonth = parseInt(monthTo) - 1; // Convertir a índice 0-based
+        
+        const distributionData = calculateDistributionForMonth(finalYear, finalMonth);
+        
+        console.log(`Usando distribución para ${finalYear}-${finalMonth + 1}:`, distributionData);
+        
         charts.distribution = new Chart(ctxDistribution, {
             type: 'doughnut',
             data: {
                 labels: data.clients,
                 datasets: [{
-                    data: data.clientsData,
+                    data: distributionData, // USAR DISTRIBUCIÓN CALCULADA DINÁMICAMENTE
                     backgroundColor: [
                         '#2E86AB', '#4CB944', '#E94F64', '#FFD166'
                     ],
@@ -287,7 +315,9 @@ function updateCharts(data, client, yearFrom, yearTo) {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.label}: ${context.raw} (${Math.round(context.parsed)}%)`;
+                                const total = distributionData.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : '0';
+                                return `${context.label}: ${context.raw} (${percentage}%)`;
                             }
                         }
                     }

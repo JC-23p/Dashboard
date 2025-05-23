@@ -157,25 +157,82 @@ function updateCharts(data, client, yearFrom, yearTo) {
         }
     }
     
-    // 1. Gráfico de evolución (se mantiene igual)
+    // 1. Gráfico de evolución con 3 series
     charts.evolution = new Chart(ctxEvolution, {
-        type: data.totals.length > 1 ? 'line' : 'bar',
+        type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: client === "all" ? `Total` : `Total (${client})`,
-                data: data.totals,
-                borderColor: '#2E86AB',
-                backgroundColor: data.totals.length > 1 ? 'rgba(46, 134, 171, 0.1)' : '#2E86AB',
-                fill: data.totals.length > 1,
-                tension: 0.3,
-                borderWidth: 2
-            }]
+            datasets: [
+                {
+                    label: 'Totales',
+                    data: data.totals,
+                    borderColor: '#2E86AB',
+                    backgroundColor: 'rgba(46, 134, 171, 0.1)',
+                    tension: 0.3,
+                    borderWidth: 2,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Entradas',
+                    data: data.hired,
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    tension: 0.1,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Salidas',
+                    data: data.exits,
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderWidth: 1,
+                    tension: 0.1,
+                    yAxisID: 'y1'
+                }
+            ]
         },
-        options: getChartOptions('Evolución de desarrolladores')
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Evolución mensual',
+                    font: { size: 14 }
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Totales'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Entradas/Salidas'
+                    }
+                }
+            }
+        }
     });
     
-    // 2. Nuevo gráfico de torta para distribución (solo para "all")
+    // 2. Gráfico de torta para distribución (solo para "all")
     if (client === "all" && data.clients && data.clientsData) {
         charts.distribution = new Chart(ctxDistribution, {
             type: 'doughnut',
@@ -184,13 +241,9 @@ function updateCharts(data, client, yearFrom, yearTo) {
                 datasets: [{
                     data: data.clientsData,
                     backgroundColor: [
-                        '#2E86AB',  // Azul
-                        '#4CB944',  // Verde
-                        '#E94F64',  // Rojo
-                        '#FFD166'   // Amarillo
+                        '#2E86AB', '#4CB944', '#E94F64', '#FFD166'
                     ],
-                    borderWidth: 0,
-                    hoverOffset: 10
+                    borderWidth: 0
                 }]
             },
             options: {
@@ -200,7 +253,8 @@ function updateCharts(data, client, yearFrom, yearTo) {
                     legend: {
                         position: 'right',
                         labels: {
-                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
                             padding: 20
                         }
                     },
@@ -212,20 +266,13 @@ function updateCharts(data, client, yearFrom, yearTo) {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const label = context.label || '';
-                                const value = context.raw || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100);
-                                return `${label}: ${value} (${percentage}%)`;
+                                return `${context.label}: ${context.raw} (${Math.round(context.parsed)}%)`;
                             }
                         }
                     }
                 },
-                cutout: '65%',
-                animation: {
-                    animateScale: true,
-                    animateRotate: true
-                }
+                cutout: '70%',
+                scales: {} // Sin ejes
             }
         });
         document.querySelector('.chart-message').style.display = 'none';
@@ -234,28 +281,6 @@ function updateCharts(data, client, yearFrom, yearTo) {
     }
     
     console.log("Gráficos actualizados");
-}
-
-// Configuración común de gráficos
-function getChartOptions(title) {
-    return {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: title.includes('Evolución') ? false : true },
-            title: {
-                display: true,
-                text: title,
-                font: { size: 14 }
-            }
-        },
-        scales: {
-            y: { beginAtZero: false }
-        },
-        layout: {
-            padding: { top: 10, bottom: 10, left: 10, right: 10 }
-        }
-    };
 }
 
 // Redimensionar al cambiar ventana

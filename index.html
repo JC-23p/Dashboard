@@ -8,7 +8,80 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="dashboard">
+    <!-- Sistema de login -->
+<div id="login-container" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+">
+    <div style="
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    ">
+        <h2>🔒 Acceso 23People</h2>
+        <input 
+            type="text" 
+            id="username" 
+            placeholder="Usuario" 
+            style="padding: 10px; margin: 10px 0; width: 100%;"
+        ><br>
+        <input 
+            type="password" 
+            id="password" 
+            placeholder="Contraseña" 
+            style="padding: 10px; margin: 10px 0; width: 100%;"
+        ><br>
+        <button 
+            onclick="checkLogin()" 
+            style="
+                padding: 10px 20px;
+                background: #2E86AB;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            "
+        >Ingresar</button>
+        <p id="login-error" style="color: red; margin-top: 10px;"></p>
+    </div>
+</div>
+
+<script>
+    function checkLogin() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorElement = document.getElementById('login-error');
+
+        // Credenciales válidas (cámbialas)
+        const validUser = 'jcsoto';
+        const validPass = '23people2024'; // ¡Cambia esta contraseña!
+
+        if (username === validUser && password === validPass) {
+            document.getElementById('login-container').style.display = 'none';
+            localStorage.setItem('isAuthenticated', 'true'); // Persistencia simple
+        } else {
+            errorElement.textContent = 'Usuario o contraseña incorrectos';
+        }
+    }
+
+    // Verificar si ya está autenticado al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('isAuthenticated') === 'true') {
+            document.getElementById('login-container').style.display = 'none';
+        }
+    });
+</script>
+<div class="dashboard">
         <h1>📊 Dashboard de Desarrolladores</h1>
         
         <!-- Filtros -->

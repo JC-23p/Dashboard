@@ -39,7 +39,7 @@ function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
 
     // Convertir a números
     yearFrom = parseInt(yearFrom);
-    monthFrom = parseInt(monthFrom) - 1;
+    monthFrom = parseInt(monthFrom) - 1; // Ajustar a índice 0-based
     yearTo = parseInt(yearTo);
     monthTo = parseInt(monthTo) - 1;
 
@@ -120,6 +120,8 @@ function updateKPIs(data) {
     document.getElementById('hired').textContent = hired;
     document.getElementById('exits').textContent = exits;
     document.getElementById('rotation').textContent = rotation;
+    
+    console.log("KPIs actualizados:", {total, hired, exits, rotation});
 }
 
 // Actualizar gráficos
@@ -132,11 +134,10 @@ function updateCharts(data, client, yearFrom, yearTo) {
     if (charts.evolution) charts.evolution.destroy();
     if (charts.distribution) charts.distribution.destroy();
     
-    // Preparar labels para el eje X
+    // Preparar labels para el eje X (se mantiene igual)
     const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const labels = [];
     
-    // Generar labels para el rango seleccionado
     if (data.totals.length <= 1) {
         const monthIndex = parseInt(document.getElementById('month-from').value) - 1;
         labels.push(`${monthLabels[monthIndex]} ${yearFrom}`);
@@ -153,45 +154,8 @@ function updateCharts(data, client, yearFrom, yearTo) {
             }
         }
     }
-    // En la función updateCharts, modifica las opciones del gráfico evolutivo:
-charts.evolution = new Chart(ctxEvolution, {
-    type: 'line',
-    data: { /* ... tus datos ... */ },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-            padding: {
-                top: 20,
-                bottom: 30,
-                left: 20,
-                right: 20
-            }
-        },
-        plugins: {
-            legend: {
-                position: 'top',
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-                ticks: {
-                    precision: 0
-                }
-            },
-            x: {
-                ticks: {
-                    autoSkip: false,
-                    maxRotation: 45,
-                    minRotation: 45
-                }
-            }
-        }
-    }
-});
     
-    // 1. Gráfico de evolución con 3 series
+  // 1. Gráfico de evolución con 3 series y UN SOLO EJE
     charts.evolution = new Chart(ctxEvolution, {
         type: 'line',
         data: {
@@ -225,41 +189,10 @@ charts.evolution = new Chart(ctxEvolution, {
                 }
             ]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        boxWidth: 12,
-                        padding: 20,
-                        usePointStyle: true
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Evolución mensual',
-                    font: { size: 14 }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Cantidad de desarrolladores'
-                    }
-                }
-            }
-        }
+        
     });
     
-    // 2. Gráfico de torta para distribución
+    // 2. Gráfico de torta para distribución (solo para "all")
     if (client === "all" && data.clients && data.clientsData) {
         charts.distribution = new Chart(ctxDistribution, {
             type: 'doughnut',
@@ -298,27 +231,20 @@ charts.evolution = new Chart(ctxEvolution, {
                         }
                     }
                 },
-                cutout: '70%'
+                cutout: '70%',
+                scales: {} // Sin ejes
             }
         });
         document.querySelector('.chart-message').style.display = 'none';
     } else {
         document.querySelector('.chart-message').style.display = 'block';
     }
-}
-
-// Función para ajustar dinámicamente la altura
-function adjustChartHeight() {
-    const container = document.querySelector('#evolution-container');
-    const aspectRatio = 16 / 9; // Proporción deseada
-    const width = container.clientWidth;
-    container.style.height = `${width / aspectRatio}px`;
     
-    if (charts.evolution) {
-        charts.evolution.resize();
-    }
+    console.log("Gráficos actualizados");
 }
 
-// Ejecutar al cargar y al redimensionar
-window.addEventListener('load', adjustChartHeight);
-window.addEventListener('resize', adjustChartHeight);
+// Redimensionar al cambiar ventana
+window.addEventListener('resize', () => {
+    if (charts.evolution) charts.evolution.resize();
+    if (charts.distribution) charts.distribution.resize();
+});

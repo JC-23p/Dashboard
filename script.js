@@ -157,7 +157,7 @@ function updateCharts(data, client, yearFrom, yearTo) {
         }
     }
     
-    // 1. Gráfico de evolución con 3 series
+  // 1. Gráfico de evolución con 3 series y UN SOLO EJE
     charts.evolution = new Chart(ctxEvolution, {
         type: 'line',
         data: {
@@ -169,27 +169,25 @@ function updateCharts(data, client, yearFrom, yearTo) {
                     borderColor: '#2E86AB',
                     backgroundColor: 'rgba(46, 134, 171, 0.1)',
                     tension: 0.3,
-                    borderWidth: 2,
-                    yAxisID: 'y'
+                    borderWidth: 3,
+                    fill: true
                 },
                 {
                     label: 'Entradas',
                     data: data.hired,
                     borderColor: '#2ecc71',
                     backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    tension: 0.1,
-                    yAxisID: 'y1'
+                    borderWidth: 2,
+                    borderDash: [5, 3],
+                    tension: 0
                 },
                 {
                     label: 'Salidas',
                     data: data.exits,
                     borderColor: '#e74c3c',
                     backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                    borderWidth: 1,
-                    tension: 0.1,
-                    yAxisID: 'y1'
+                    borderWidth: 2,
+                    tension: 0
                 }
             ]
         },
@@ -199,35 +197,34 @@ function updateCharts(data, client, yearFrom, yearTo) {
             plugins: {
                 legend: {
                     position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20,
+                        usePointStyle: true
+                    }
                 },
                 title: {
                     display: true,
                     text: 'Evolución mensual',
                     font: { size: 14 }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
                 }
             },
             scales: {
                 y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
+                    beginAtZero: false,
                     title: {
                         display: true,
-                        text: 'Totales'
-                    }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    grid: {
-                        drawOnChartArea: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Entradas/Salidas'
+                        text: 'Cantidad de desarrolladores'
                     }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'nearest'
             }
         }
     });

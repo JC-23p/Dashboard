@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("Datos cargados:", currentData);
         
         // Configurar eventos
-        document.getElementById('client-filter').addEventListener('change', updateDashboard);
-        document.getElementById('year-filter').addEventListener('change', updateDashboard);
-        document.getElementById('month-filter').addEventListener('change', updateDashboard);
+        ['client-filter', 'year-from', 'month-from', 'year-to', 'month-to'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updateDashboard);
+        });
         
         // Carga inicial
         updateDashboard();
@@ -27,46 +27,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Función para cargar meses disponibles
-function loadMonthFilter(monthsData) {
-    const monthSelect = document.getElementById('month-filter');
-    monthSelect.innerHTML = '<option value="all">Todos los meses</option>';
-    
-    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const monthsWithData = monthNames.slice(0, monthsData.totals.length);
-    
-    monthsWithData.forEach((month, index) => {
-        monthSelect.innerHTML += `<option value="${index}">${month}</option>`;
-    });
-    
-    monthSelect.disabled = false;
-    console.log("Meses cargados:", monthsWithData);
+// Función para filtrar por rango de fechas
+function filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo) {
+    const result = {
+        totals: [],
+        hired: [],
+        exits: [],
+        clients: clientData[yearFrom]?.clients || [],
+        clientsData: clientData[yearFrom]?.clientsData || []
+    };
+
+    // Convertir a números
+    yearFrom = parseInt(yearFrom);
+    monthFrom = parseInt(monthFrom) - 1; // Ajustar a índice 0-based
+    yearTo = parseInt(yearTo);
+    monthTo = parseInt(monthTo) - 1;
+
+    // Validar rango
+    if (yearFrom > yearTo || (yearFrom === yearTo && monthFrom > monthTo)) {
+        alert("La fecha de inicio debe ser anterior a la fecha de fin");
+        return result;
+    }
+
+    // Iterar por cada año y mes en el rango
+    for (let year = yearFrom; year <= yearTo; year++) {
+        if (!clientData[year]) continue;
+        
+        const startMonth = (year === yearFrom) ? monthFrom : 0;
+        const endMonth = (year === yearTo) ? monthTo : 11;
+        
+        for (let month = startMonth; month <= endMonth; month++) {
+            if (clientData[year].totals[month] !== undefined) {
+                result.totals.push(clientData[year].totals[month]);
+                result.hired.push(clientData[year].hired[month]);
+                result.exits.push(clientData[year].exits[month]);
+            }
+        }
+    }
+
+    return result;
 }
 
 // Actualizar dashboard completo
 function updateDashboard() {
     try {
         const client = document.getElementById('client-filter').value;
-        const year = document.getElementById('year-filter').value;
-        const monthSelect = document.getElementById('month-filter');
+        const yearFrom = document.getElementById('year-from').value;
+        const monthFrom = document.getElementById('month-from').value;
+        const yearTo = document.getElementById('year-to').value;
+        const monthTo = document.getElementById('month-to').value;
+
+        console.log(`Filtrando por: ${client}, ${yearFrom}-${monthFrom} a ${yearTo}-${monthTo}`);
         
-        console.log(`Filtrando por: ${client}, ${year}`);
+        const clientData = currentData[client];
+        if (!clientData) throw new Error(`No hay datos para ${client}`);
         
-        const filteredData = currentData[client]?.[year];
-        if (!filteredData) throw new Error(`No hay datos para ${client} en ${year}`);
+        const filteredData = filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo);
         
-        // Actualizar selector de meses si es necesario
-        if (monthSelect.disabled || monthSelect.dataset.currentYear !== year) {
-            loadMonthFilter(filteredData);
-            monthSelect.dataset.currentYear = year;
-        }
-        
-        const month = monthSelect.value;
-        const finalData = month === "all" ? filteredData : filterDataByMonth(filteredData, parseInt(month));
-        
-        console.log("Datos finales:", finalData);
-        updateKPIs(finalData);
-        updateCharts(finalData, client, year, month);
+        console.log("Datos finales:", filteredData);
+        updateKPIs(filteredData);
+        updateCharts(filteredData, client, yearFrom, yearTo);
         
     } catch (error) {
         console.error('Error en updateDashboard:', error);
@@ -75,26 +95,37 @@ function updateDashboard() {
 
 // Actualizar KPIs
 function updateKPIs(data) {
+    if (data.totals.length === 0) {
+        document.getElementById('total').textContent = '-';
+        document.getElementById('hired').textContent = '-';
+        document.getElementById('exits').textContent = '-';
+        document.getElementById('rotation').textContent = '-';
+        return;
+    }
+
     const lastIndex = data.totals.length - 1;
     const total = data.totals[lastIndex];
     const hired = data.hired[lastIndex];
     const exits = data.exits[lastIndex];
     
     // Calcular rotación
-    const prevTotal = data.totals[lastIndex - 1] || total;
-    const rotation = ((exits / ((total + prevTotal) / 2)) * 100).toFixed(1);
+    let rotation = '-';
+    if (data.totals.length > 1) {
+        const prevTotal = data.totals[lastIndex - 1] || total;
+        rotation = ((exits / ((total + prevTotal) / 2)) * 100).toFixed(1) + '%';
+    }
     
     // Actualizar DOM
     document.getElementById('total').textContent = total;
     document.getElementById('hired').textContent = hired;
     document.getElementById('exits').textContent = exits;
-    document.getElementById('rotation').textContent = `${rotation}%`;
+    document.getElementById('rotation').textContent = rotation;
     
     console.log("KPIs actualizados:", {total, hired, exits, rotation});
 }
 
 // Actualizar gráficos
-function updateCharts(data, client, year, month) {
+function updateCharts(data, client, yearFrom, yearTo) {
     console.log("Actualizando gráficos...");
     const ctxEvolution = document.getElementById('evolution-chart');
     const ctxDistribution = document.getElementById('distribution-chart');
@@ -103,23 +134,40 @@ function updateCharts(data, client, year, month) {
     if (charts.evolution) charts.evolution.destroy();
     if (charts.distribution) charts.distribution.destroy();
     
-    // Preparar labels
+    // Preparar labels para el eje X
     const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const labels = month === "all" 
-        ? monthLabels.slice(0, data.totals.length)
-        : [`${monthLabels[month]} ${year}`];
+    const labels = [];
+    
+    // Generar labels descriptivos para el rango seleccionado
+    if (data.totals.length <= 1) {
+        const monthIndex = parseInt(document.getElementById('month-from').value) - 1;
+        labels.push(`${monthLabels[monthIndex]} ${yearFrom}`);
+    } else {
+        // Para rangos más largos, mostrar año-mes
+        let currentYear = parseInt(yearFrom);
+        let currentMonth = parseInt(document.getElementById('month-from').value) - 1;
+        
+        for (let i = 0; i < data.totals.length; i++) {
+            labels.push(`${monthLabels[currentMonth]} ${currentYear}`);
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+        }
+    }
     
     // 1. Gráfico de evolución
     charts.evolution = new Chart(ctxEvolution, {
-        type: month === "all" ? 'line' : 'bar',
+        type: data.totals.length > 1 ? 'line' : 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: client === "all" ? `Total (${year})` : `Total (${client})`,
-                data: month === "all" ? data.totals : [data.totals[0]],
+                label: client === "all" ? `Total` : `Total (${client})`,
+                data: data.totals,
                 borderColor: '#2E86AB',
-                backgroundColor: month === "all" ? 'rgba(46, 134, 171, 0.1)' : '#2E86AB',
-                fill: month === "all",
+                backgroundColor: data.totals.length > 1 ? 'rgba(46, 134, 171, 0.1)' : '#2E86AB',
+                fill: data.totals.length > 1,
                 tension: 0.3,
                 borderWidth: 2
             }]
@@ -130,17 +178,23 @@ function updateCharts(data, client, year, month) {
     // 2. Gráfico de distribución (solo para "all")
     if (client === "all" && data.clients && data.clientsData) {
         charts.distribution = new Chart(ctxDistribution, {
-            type: 'bar',
+            type: 'doughnut',
             data: {
                 labels: data.clients,
                 datasets: [{
-                    label: 'Distribución',
                     data: data.clientsData,
                     backgroundColor: ['#2E86AB', '#4CB944', '#E94F64', '#FFD166'],
                     borderWidth: 0
                 }]
             },
-            options: getChartOptions('Distribución por cliente')
+            options: {
+                ...getChartOptions('Distribución por cliente'),
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
         });
         document.querySelector('.chart-message').style.display = 'none';
     } else {
@@ -150,24 +204,13 @@ function updateCharts(data, client, year, month) {
     console.log("Gráficos actualizados");
 }
 
-// Función auxiliar: Filtrar datos por mes
-function filterDataByMonth(data, monthIndex) {
-    return {
-        totals: [data.totals[monthIndex]],
-        hired: [data.hired[monthIndex]],
-        exits: [data.exits[monthIndex]],
-        clients: data.clients,
-        clientsData: data.clientsData
-    };
-}
-
 // Configuración común de gráficos
 function getChartOptions(title) {
     return {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: { display: false },
+            legend: { display: title.includes('Evolución') ? false : true },
             title: {
                 display: true,
                 text: title,
@@ -188,46 +231,3 @@ window.addEventListener('resize', () => {
     if (charts.evolution) charts.evolution.resize();
     if (charts.distribution) charts.distribution.resize();
 });
-
-function filterByDateRange(data, yearFrom, monthFrom, yearTo, monthTo) {
-    const result = {
-        totals: [],
-        hired: [],
-        exits: [],
-        clients: data.clients,
-        clientsData: data.clientsData
-    };
-
-    // Convertir fechas a índices
-    const startIndex = (parseInt(yearFrom) - 2023) * 12 + parseInt(monthFrom);
-    const endIndex = (parseInt(yearTo) - 2023) * 12 + parseInt(monthTo);
-
-    // Filtrar datos
-    for (let year in data) {
-        for (let month = 0; month < 12; month++) {
-            const currentIndex = (parseInt(year) - 2023) * 12 + month;
-            if (currentIndex >= startIndex && currentIndex <= endIndex) {
-                if (data[year].totals[month] !== undefined) {
-                    result.totals.push(data[year].totals[month]);
-                    result.hired.push(data[year].hired[month]);
-                    result.exits.push(data[year].exits[month]);
-                }
-            }
-        }
-    }
-
-    return result;
-}
-
-function updateDashboard() {
-    const client = document.getElementById('client-filter').value;
-    const yearFrom = document.getElementById('year-from').value;
-    const monthFrom = document.getElementById('month-from').value;
-    const yearTo = document.getElementById('year-to').value;
-    const monthTo = document.getElementById('month-to').value;
-
-    const filteredData = filterByDateRange(currentData[client], yearFrom, monthFrom, yearTo, monthTo);
-    
-    updateKPIs(filteredData);
-    updateCharts(filteredData, client, yearFrom, yearTo);
-}

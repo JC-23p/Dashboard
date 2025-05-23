@@ -14,9 +14,15 @@ body {
 /* Filtros */
 .filters {
     display: flex;
-    gap: 15px;
+    gap: 10px;
+    align-items: center;
     margin: 20px 0;
     flex-wrap: wrap;
+}
+
+.filters span {
+    font-weight: bold;
+    color: #555;
 }
 
 .filter-dropdown {
@@ -24,7 +30,7 @@ body {
     border-radius: 6px;
     border: 1px solid #ddd;
     font-size: 14px;
-    min-width: 150px;
+    min-width: 100px;
 }
 
 .filter-dropdown:disabled {
@@ -106,23 +112,4 @@ body {
     .filter-dropdown {
         width: 100%;
     }
-}
-.filters {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.filters span {
-    font-weight: bold;
-    color: #555;
-}
-
-.filter-dropdown {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-    min-width: 100px;
 }

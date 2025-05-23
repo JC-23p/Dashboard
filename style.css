@@ -88,10 +88,3 @@ body {
 #evolution-container {
     height: 100%; /* Ocupa todo el espacio del chart-wrapper */
 }
-
-/* Opcional: Si quieres que el gráfico sea más alto en móviles */
-@media (max-width: 768px) {
-    #evolution-container {
-        height: 400px;
-    }
-}

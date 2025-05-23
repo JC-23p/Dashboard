@@ -304,3 +304,16 @@ window.addEventListener('resize', () => {
     if (charts.evolution) charts.evolution.resize();
     if (charts.distribution) charts.distribution.resize();
 });
+
+function adjustChartHeight() {
+    const container = document.querySelector('.charts-container');
+    const windowHeight = window.innerHeight;
+    const headerHeight = document.querySelector('h1').offsetHeight;
+    const filtersHeight = document.querySelector('.filters').offsetHeight;
+    const kpisHeight = document.querySelector('.kpis').offsetHeight;
+    
+    container.style.minHeight = `${windowHeight - headerHeight - filtersHeight - kpisHeight - 100}px`;
+}
+
+window.addEventListener('load', adjustChartHeight);
+window.addEventListener('resize', adjustChartHeight);

@@ -41,6 +41,44 @@ function getPreviousMonthValue(data, dataType, currentIndex) {
     return data[dataType][currentIndex - 1];
 }
 
+// NUEVA FUNCIÓN: Obtener nombre del mes
+function getMonthName(monthNumber) {
+    const months = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[monthNumber - 1] || 'Enero';
+}
+
+// NUEVA FUNCIÓN: Actualizar títulos de KPIs con mes/año actual
+function updateKpiTitles() {
+    const monthTo = document.getElementById('month-to').value;
+    const yearTo = document.getElementById('year-to').value;
+    const monthName = getMonthName(parseInt(monthTo));
+    
+    // Obtener todos los títulos de KPIs
+    const kpiTitles = document.querySelectorAll('.kpi-card .kpi-title');
+    
+    if (kpiTitles.length >= 5) {
+        // Total Activos
+        kpiTitles[0].textContent = `👥 Total Activos ${monthName}`;
+        
+        // Altas (mes)
+        kpiTitles[1].textContent = `📥 Altas ${monthName}`;
+        
+        // Bajas (mes)
+        kpiTitles[2].textContent = `📤 Bajas ${monthName}`;
+        
+        // Rotación Mensual
+        kpiTitles[3].textContent = `🔄 Rotación ${monthName}`;
+        
+        // Rotación Anual
+        kpiTitles[4].textContent = `📈 Rotación Anual ${yearTo}`;
+    }
+    
+    console.log(`Títulos KPI actualizados para: ${monthName} y año ${yearTo}`);
+}
+
 // Actualizar KPIs - MODIFICADO con indicadores de tendencia
 function updateKPIs(data, clientData, currentYear) {
     if (data.totals.length === 0) {
@@ -232,6 +270,18 @@ function initializeDynamicSelectors() {
         updateMonthOptions('year-to', 'month-to');
         updateDashboard();
     });
+    
+    // NUEVO: Agregar listener para actualizar título cuando cambie el mes o año
+    document.getElementById('month-to').addEventListener('change', () => {
+        updateKpiTitles();
+        updateDashboard();
+    });
+    
+    document.getElementById('year-to').addEventListener('change', () => {
+        updateKpiTitles();
+        updateMonthOptions('year-to', 'month-to');
+        updateDashboard();
+    });
 }
 
 // Calcular rotación anual
@@ -263,11 +313,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         initializeDynamicSelectors();
         
-        ['client-filter', 'month-from', 'month-to'].forEach(id => {
+        ['client-filter', 'month-from'].forEach(id => {
             document.getElementById(id).addEventListener('change', updateDashboard);
         });
         
+        // Actualizar títulos iniciales
+        updateKpiTitles();
         updateDashboard();
+        
+        // NUEVO: Agregar evento click al KPI de bajas
+        const exitsKpi = document.querySelector('.kpi-card.red');
+        if (exitsKpi) {
+            exitsKpi.style.cursor = 'pointer';
+            exitsKpi.addEventListener('click', function() {
+                // Obtener el mes y año actual del filtro
+                const currentMonth = document.getElementById('month-to').value;
+                const currentYear = document.getElementById('year-to').value;
+                const currentClient = document.getElementById('client-filter').value;
+                
+                // Construir URL con parámetros
+                const url = `bajas-detalle.html?mes=${currentMonth}&ano=${currentYear}&cliente=${currentClient}`;
+                
+                // Abrir en nueva ventana
+                window.open(url, '_blank');
+            });
+            
+            // Agregar indicador visual de que es clickeable
+            exitsKpi.setAttribute('title', 'Click para ver detalle de bajas');
+        }
+        
     } catch (error) {
         console.error('Error inicial:', error);
         alert('Error al cargar los datos. Ver consola.');
@@ -334,6 +408,10 @@ function updateDashboard() {
         const filteredData = filterByDateRange(clientData, yearFrom, monthFrom, yearTo, monthTo);
         
         console.log("Datos finales:", filteredData);
+        
+        // Actualizar títulos de KPIs
+        updateKpiTitles();
+        
         updateKPIs(filteredData, clientData, yearTo);
         updateCharts(filteredData, client, yearFrom, yearTo, monthTo);
         
@@ -458,7 +536,7 @@ function updateCharts(data, client, yearFrom, yearTo, monthTo) {
                 labels: data.clients,
                 datasets: [{
                     data: distributionData,
-                    backgroundColor: ['#f7dc6f','#7b1fa2' ,'#b2ebf2', '#FFD166'],
+                    backgroundColor: ['#2E86AB', '#4CB944', '#E94F64', '#FFD166'],
                     borderWidth: 0
                 }]
             },

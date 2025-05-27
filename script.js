@@ -536,7 +536,7 @@ function updateCharts(data, client, yearFrom, yearTo, monthTo) {
                 labels: data.clients,
                 datasets: [{
                     data: distributionData,
-                    backgroundColor: ['#2E86AB', '#4CB944', '#E94F64', '#FFD166'],
+                    backgroundColor: ['#ba68c8', '#ffeb3b', '#E94F64', '#FFD166'],
                     borderWidth: 0
                 }]
             },

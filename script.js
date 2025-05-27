@@ -548,7 +548,7 @@ function updateCharts(data, client, yearFrom, yearTo, monthTo) {
                         position: 'right',
                         labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 }
                     },
-                    title: { display: true, text: `Distribución ${labels[labels.length-1]}`, font: { size: 14 } },
+                    title: { display: true, text: `Distribución por Clientes ${labels[labels.length-1]}`, font: { size: 14 } },
                     tooltip: {
                         callbacks: {
                             label: function(context) {

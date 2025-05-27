@@ -61,16 +61,16 @@ function updateKpiTitles() {
     
     if (kpiTitles.length >= 5) {
         // Total Activos
-        kpiTitles[0].textContent = `👥 Total Activos ${monthName}`;
+        kpiTitles[0].textContent = `👥 Total Activos ${monthName} ${yearTo}`;
         
         // Altas (mes)
-        kpiTitles[1].textContent = `📥 Altas ${monthName}`;
+        kpiTitles[1].textContent = `📥 Altas ${monthName} ${yearTo}`;
         
         // Bajas (mes)
-        kpiTitles[2].textContent = `📤 Bajas ${monthName}`;
+        kpiTitles[2].textContent = `📤 Bajas ${monthName} ${yearTo}`;
         
         // Rotación Mensual
-        kpiTitles[3].textContent = `🔄 Rotación ${monthName}`;
+        kpiTitles[3].textContent = `🔄 Rotación ${monthName} ${yearTo}`;
         
         // Rotación Anual
         kpiTitles[4].textContent = `📈 Rotación Anual ${yearTo}`;

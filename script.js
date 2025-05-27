@@ -430,7 +430,7 @@ function calculateDistributionForMonth(year, month) {
     const equifaxTotal = currentData.equifax[year]?.totals[month] || 0;
     const honeywellTotal = currentData.honeywell[year]?.totals[month] || 0;
     
-    console.log(`Distribución ${year}-${month + 1}: Equifax=${equifaxTotal}, Honeywell=${honeywellTotal}`);
+    console.log(`Distribución por Clientes ${year}-${month + 1}: Equifax=${equifaxTotal}, Honeywell=${honeywellTotal}`);
     
     return [equifaxTotal, honeywellTotal];
 }

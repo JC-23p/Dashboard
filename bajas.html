@@ -476,6 +476,42 @@
                 height: 300px;
             }
         }
+
+        /* Ordenamiento */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .sortable:hover {
+            background: #e2e8f0;
+        }
+
+        .sortable::after {
+            content: '↕';
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+
+        .sortable.asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        .sortable.desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        /* Fecha */
+        .fecha-cell {
+            white-space: nowrap;
+            font-family: monospace;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -553,8 +589,9 @@
                         <th class="sortable" data-column="cliente">Cliente</th>
                         <th class="sortable" data-column="motivo">Motivo Salida</th>
                         <th class="sortable" data-column="razon">Razón Detallada</th>
+                        <th class="sortable" data-column="fecha">Fecha Salida</th>
                         <th class="sortable" data-column="permanencia">Permanencia</th>
-                        <th>ID Empleado</th>
+                        <th class="sortable" data-column="id">ID Empleado</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -586,6 +623,7 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Finalización del proyecto de automatización industrial',
+                    fechaSalida: '2025-05-02',
                     permanenciaMeses: 3
                 },
                 {
@@ -594,6 +632,7 @@
                     motivoSalida: 'renuncia',
                     motivoTexto: 'Renuncia voluntaria',
                     razonSalida: 'Mejor oferta laboral en otra empresa',
+                    fechaSalida: '2025-05-10',
                     permanenciaMeses: 18
                 },
                 {
@@ -602,6 +641,7 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Proyecto de migración de datos completado',
+                    fechaSalida: '2025-05-05',
                     permanenciaMeses: 8
                 },
                 {
@@ -610,6 +650,7 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Vencimiento de contrato temporal',
+                    fechaSalida: '2025-05-15',
                     permanenciaMeses: 6
                 },
                 {
@@ -618,6 +659,7 @@
                     motivoSalida: 'renuncia',
                     motivoTexto: 'Renuncia voluntaria',
                     razonSalida: 'Cambio de ciudad por motivos personales',
+                    fechaSalida: '2025-05-20',
                     permanenciaMeses: 24
                 },
                 {
@@ -626,6 +668,7 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Implementación de sistema CRM finalizada',
+                    fechaSalida: '2025-05-12',
                     permanenciaMeses: 15
                 },
                 {
@@ -634,6 +677,7 @@
                     motivoSalida: 'renuncia',
                     motivoTexto: 'Renuncia voluntaria',
                     razonSalida: 'Decisión de emprender negocio propio',
+                    fechaSalida: '2025-05-08',
                     permanenciaMeses: 9
                 },
                 {
@@ -642,6 +686,7 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Reducción de equipo por reestructuración',
+                    fechaSalida: '2025-05-25',
                     permanenciaMeses: 4
                 },
                 {
@@ -650,6 +695,7 @@
                     motivoSalida: 'desvinculacion',
                     motivoTexto: 'Desvinculación',
                     razonSalida: 'Bajo rendimiento y incumplimiento de objetivos',
+                    fechaSalida: '2025-05-30',
                     permanenciaMeses: 2
                 }
             ]
@@ -661,6 +707,13 @@
         let currentPage = 1;
         let motivosChart = null;
         const itemsPerPage = 10;
+
+        // Función para formatear fecha
+        function formatFecha(fecha) {
+            if (!fecha) return '';
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(fecha).toLocaleDateString('es-ES', options);
+        }
 
         // Función para actualizar estadísticas y gráfico de motivos
         function updateMotivosStats() {
@@ -801,7 +854,8 @@
                     empleado.cliente.toLowerCase().includes(searchTerm) ||
                     empleado.motivoTexto.toLowerCase().includes(searchTerm) ||
                     empleado.razonSalida.toLowerCase().includes(searchTerm) ||
-                    empleado.id.toLowerCase().includes(searchTerm);
+                    empleado.id.toLowerCase().includes(searchTerm) ||
+                    empleado.fechaSalida.toLowerCase().includes(searchTerm);
 
                 const matchesMotivo = !motivoFilter || empleado.motivoSalida === motivoFilter;
 
@@ -828,8 +882,13 @@
                 let aVal = a[column];
                 let bVal = b[column];
 
+                // Manejo especial para fechas
+                if (column === 'fechaSalida') {
+                    aVal = new Date(aVal).getTime();
+                    bVal = new Date(bVal).getTime();
+                }
                 // Manejo especial para números
-                if (column === 'permanenciaMeses' || column === 'porcentaje') {
+                else if (column === 'permanenciaMeses' || column === 'porcentaje') {
                     aVal = parseFloat(aVal);
                     bVal = parseFloat(bVal);
                 }
@@ -863,7 +922,7 @@
             if (pageData.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <div class="empty-state-icon">🔍</div>
                                 <div class="empty-state-title">No se encontraron resultados</div>
@@ -887,6 +946,9 @@
                     </td>
                     <td style="max-width: 300px;">
                         ${empleado.razonSalida}
+                    </td>
+                    <td class="fecha-cell">
+                        ${formatFecha(empleado.fechaSalida)}
                     </td>
                     <td class="permanencia-cell ${empleado.permanenciaMeses < 3 ? 'low' : ''}">
                         ${empleado.permanenciaMeses} meses

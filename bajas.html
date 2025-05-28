@@ -584,16 +584,16 @@
         <!-- Tabla -->
         <div class="table-container">
             <table class="data-table" id="data-table">
-                <thead>
-                    <tr>
-                        <th class="sortable" data-column="cliente">Cliente</th>
-                        <th class="sortable" data-column="motivo">Motivo Salida</th>
-                        <th class="sortable" data-column="razon">Razón Detallada</th>
-                        <th class="sortable" data-column="fecha">Fecha Salida</th>
-                        <th class="sortable" data-column="permanencia">Permanencia</th>
-                        <th class="sortable" data-column="id">ID Empleado</th>
-                    </tr>
-                </thead>
+              <thead>
+    <tr>
+        <th class="sortable" data-column="cliente">Cliente</th>
+        <th class="sortable" data-column="motivoTexto">Motivo Salida</th>
+        <th>Razón Detallada</th> <!-- Eliminado sortable -->
+        <th class="sortable" data-column="fechaSalida">Fecha Salida</th>
+        <th class="sortable" data-column="permanenciaMeses">Permanencia</th>
+        <th class="sortable" data-column="id">ID Empleado</th>
+    </tr>
+</thead>
                 <tbody id="table-body">
                     <!-- Los datos se cargarán via JavaScript -->
                 </tbody>
@@ -869,38 +869,44 @@
         }
 
         // Ordenar datos
-        function sortData(column) {
-            let direction = 'asc';
-            
-            if (currentSort.column === column && currentSort.direction === 'asc') {
-                direction = 'desc';
-            }
+       // Modificar la función sortData
+function sortData(column) {
+    let direction = 'asc';
+    
+    if (currentSort.column === column && currentSort.direction === 'asc') {
+        direction = 'desc';
+    }
 
-            currentSort = { column, direction };
+    currentSort = { column, direction };
 
-            filteredData.sort((a, b) => {
-                let aVal = a[column];
-                let bVal = b[column];
+    filteredData.sort((a, b) => {
+        let aVal = a[column];
+        let bVal = b[column];
 
-                // Manejo especial para fechas
-                if (column === 'fechaSalida') {
-                    aVal = new Date(aVal).getTime();
-                    bVal = new Date(bVal).getTime();
-                }
-                // Manejo especial para números
-                else if (column === 'permanenciaMeses' || column === 'porcentaje') {
-                    aVal = parseFloat(aVal);
-                    bVal = parseFloat(bVal);
-                }
-
-                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            updateSortHeaders();
-            renderTable();
+        // Manejo especial para fechas
+        if (column === 'fechaSalida') {
+            aVal = new Date(aVal).getTime();
+            bVal = new Date(bVal).getTime();
         }
+        // Manejo especial para números
+        else if (column === 'permanenciaMeses') {
+            aVal = parseFloat(aVal);
+            bVal = parseFloat(bVal);
+        }
+        // Para texto, convertir a minúsculas para ordenar sin distinción mayúsculas/minúsculas
+        else if (typeof aVal === 'string') {
+            aVal = aVal.toLowerCase();
+            bVal = bVal.toLowerCase();
+        }
+
+        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    updateSortHeaders();
+    renderTable();
+}
 
         // Actualizar headers de ordenamiento
         function updateSortHeaders() {

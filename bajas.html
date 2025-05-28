@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Bajas - 23People</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Estilos base */
         * {
@@ -123,6 +124,13 @@
             min-width: 300px;
             max-width: 400px;
             height: 250px;
+            position: relative;
+        }
+
+        #motivos-chart {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
 
         .motivos-stats {
@@ -281,43 +289,6 @@
 
         /* Badges y etiquetas */
         .client-badge {
-            background: linear-gradient(135deg, #2E86AB 0%, #1a5d7a 100%);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .motivo-badge {
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: inline-block;
-        }
-
-        /* NUEVOS COLORES PARA MOTIVOS */
-        .motivo-fin-proyecto {
-            background: #95a5a6;
-            color: white;
-        }
-
-        .motivo-renuncia {
-            background: #f39c12;
-            color: white;
-        }
-
-        .motivo-desvinculacion {
-            background: #e74c3c;
-            color: white;
-        }
-
-        /* Badges de clientes con colores de la torta del dashboard */
-        .client-badge {
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 12px;
@@ -335,23 +306,29 @@
             color: #333;
         }
 
-        .percentage-cell {
-            text-align: center;
-            font-weight: 600;
-            color: #e74c3c;
-        }
-
-        .permanencia-cell {
-            text-align: center;
-        }
-
-        .permanencia-badge {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
+        .motivo-badge {
+            padding: 6px 10px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .motivo-fin-proyecto {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .motivo-renuncia {
+            background: #f39c12;
+            color: white;
+        }
+
+        .motivo-desvinculacion {
+            background: #e74c3c;
+            color: white;
         }
 
         /* Estado vacío */
@@ -489,35 +466,15 @@
                 justify-content: space-between;
                 gap: 15px;
             }
-        }
 
-        /* Ordenamiento */
-        .sortable {
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-        }
+            .motivos-section {
+                flex-direction: column;
+            }
 
-        .sortable:hover {
-            background: #e2e8f0;
-        }
-
-        .sortable::after {
-            content: '↕';
-            position: absolute;
-            right: 8px;
-            opacity: 0.5;
-            font-size: 12px;
-        }
-
-        .sortable.asc::after {
-            content: '↑';
-            opacity: 1;
-        }
-
-        .sortable.desc::after {
-            content: '↓';
-            opacity: 1;
+            .motivos-chart-container {
+                max-width: 100%;
+                height: 300px;
+            }
         }
     </style>
 </head>
@@ -550,7 +507,7 @@
         <!-- Sección de motivos -->
         <div class="motivos-section">
             <div class="motivos-chart-container">
-                <canvas id="motivos-chart"></canvas>
+                <canvas id="motivos-chart" width="400" height="250"></canvas>
             </div>
             <div class="motivos-stats">
                 <div class="motivos-stat">
@@ -698,6 +655,13 @@
             ]
         };
 
+        // Estado de la aplicación
+        let filteredData = [...bajasData.empleados];
+        let currentSort = { column: null, direction: null };
+        let currentPage = 1;
+        let motivosChart = null;
+        const itemsPerPage = 10;
+
         // Función para actualizar estadísticas y gráfico de motivos
         function updateMotivosStats() {
             const counts = {
@@ -722,7 +686,9 @@
 
         // Función para actualizar el gráfico
         function updateMotivosChart(counts) {
-            const ctx = document.getElementById('motivos-chart');
+            const ctx = document.getElementById('motivos-chart').getContext('2d');
+            
+            // Destruir el gráfico anterior si existe
             if (motivosChart) {
                 motivosChart.destroy();
             }
@@ -745,7 +711,8 @@
                             '#f39c12', // renuncia
                             '#e74c3c'  // desvinculacion
                         ],
-                        borderWidth: 0
+                        borderWidth: 1,
+                        borderColor: '#fff'
                     }]
                 },
                 options: {
@@ -771,17 +738,14 @@
                             }
                         }
                     },
-                    cutout: '65%'
+                    cutout: '65%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
                 }
             });
         }
-
-        // Estado de la aplicación
-        let filteredData = [...bajasData.empleados];
-        let currentSort = { column: null, direction: null };
-        let currentPage = 1;
-        let motivosChart = null;
-        const itemsPerPage = 10;
 
         // Funciones de utilidad
         function getMonthName(monthNumber) {
@@ -847,7 +811,7 @@
             currentPage = 1;
             renderTable();
             updateResultsInfo();
-            updateMotivosStats(); // Actualizar estadísticas de motivos al filtrar
+            updateMotivosStats();
         }
 
         // Ordenar datos
@@ -1011,7 +975,7 @@
             updatePageInfo();
             renderTable();
             updateResultsInfo();
-            updateMotivosStats(); // Inicializar gráfico y estadísticas de motivos
+            updateMotivosStats();
 
             // Búsqueda en tiempo real
             document.getElementById('search-input').addEventListener('input', filterData);

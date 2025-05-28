@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const currentClient = document.getElementById('client-filter').value;
                 
                 // Construir URL con parámetros
-                const url = `bajas-detalle.html?mes=${currentMonth}&ano=${currentYear}&cliente=${currentClient}`;
+                const url = `bajas.html?mes=${currentMonth}&ano=${currentYear}&cliente=${currentClient}`;
                 
                 // Abrir en nueva ventana
                 window.open(url, '_blank');

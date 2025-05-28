@@ -222,30 +222,48 @@
         }
 
         .motivo-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 10px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: inline-block;
         }
 
+        /* NUEVOS COLORES PARA MOTIVOS */
         .motivo-fin-proyecto {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.2);
+            background: #95a5a6;
+            color: white;
         }
 
         .motivo-renuncia {
-            background: rgba(255, 193, 7, 0.1);
-            color: #f39c12;
-            border: 1px solid rgba(255, 193, 7, 0.2);
+            background: #f39c12;
+            color: white;
         }
 
-        .motivo-termino-contrato {
-            background: rgba(108, 117, 125, 0.1);
-            color: #6c757d;
-            border: 1px solid rgba(108, 117, 125, 0.2);
+        .motivo-desvinculacion {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Badges de clientes con colores de la torta del dashboard */
+        .client-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .client-equifax {
+            background: #ba68c8;
+            color: white;
+        }
+
+        .client-honeywell {
+            background: #ffeb3b;
+            color: #333;
         }
 
         .percentage-cell {
@@ -450,11 +468,11 @@
             
             <div class="header-stats">
                 <div class="header-stat">
-                    <div class="header-stat-value" id="total-bajas">8</div>
+                    <div class="header-stat-value" id="total-bajas">9</div>
                     <div class="header-stat-label">Total Bajas</div>
                 </div>
                 <div class="header-stat">
-                    <div class="header-stat-value" id="promedio-permanencia">12.3</div>
+                    <div class="header-stat-value" id="promedio-permanencia">10.1</div>
                     <div class="header-stat-label">Promedio Meses</div>
                 </div>
             </div>
@@ -468,11 +486,11 @@
                     <option value="">Todos los motivos</option>
                     <option value="fin-proyecto">Fin de proyecto</option>
                     <option value="renuncia">Renuncia voluntaria</option>
-                    <option value="termino-contrato">Término de contrato</option>
+                    <option value="desvinculacion">Desvinculación</option>
                 </select>
             </div>
             <div class="results-info">
-                <span id="results-count">Mostrando 8 de 8 registros</span>
+                <span id="results-count">Mostrando 9 de 9 registros</span>
             </div>
         </div>
 
@@ -485,7 +503,6 @@
                         <th class="sortable" data-column="motivo">Motivo Salida</th>
                         <th class="sortable" data-column="razon">Razón Detallada</th>
                         <th class="sortable" data-column="permanencia">Permanencia</th>
-                        <th class="sortable" data-column="porcentaje">% del Total</th>
                         <th>ID Empleado</th>
                     </tr>
                 </thead>
@@ -498,7 +515,7 @@
         <!-- Paginación -->
         <div class="pagination">
             <div class="pagination-info" id="pagination-info">
-                Mostrando 1-8 de 8 registros
+                Mostrando 1-9 de 9 registros
             </div>
             <div class="pagination-controls" id="pagination-controls">
                 <!-- Los controles se generarán via JavaScript -->
@@ -518,8 +535,7 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Finalización del proyecto de automatización industrial',
-                    permanenciaMeses: 3,
-                    porcentaje: 12.5
+                    permanenciaMeses: 3
                 },
                 {
                     id: 'EMP002',
@@ -527,8 +543,7 @@
                     motivoSalida: 'renuncia',
                     motivoTexto: 'Renuncia voluntaria',
                     razonSalida: 'Mejor oferta laboral en otra empresa',
-                    permanenciaMeses: 18,
-                    porcentaje: 12.5
+                    permanenciaMeses: 18
                 },
                 {
                     id: 'EMP003',
@@ -536,17 +551,15 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Proyecto de migración de datos completado',
-                    permanenciaMeses: 8,
-                    porcentaje: 12.5
+                    permanenciaMeses: 8
                 },
                 {
                     id: 'EMP004',
                     cliente: 'Equifax',
-                    motivoSalida: 'termino-contrato',
-                    motivoTexto: 'Término de contrato',
+                    motivoSalida: 'fin-proyecto',
+                    motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Vencimiento de contrato temporal',
-                    permanenciaMeses: 6,
-                    porcentaje: 12.5
+                    permanenciaMeses: 6
                 },
                 {
                     id: 'EMP005',
@@ -554,8 +567,7 @@
                     motivoSalida: 'renuncia',
                     motivoTexto: 'Renuncia voluntaria',
                     razonSalida: 'Cambio de ciudad por motivos personales',
-                    permanenciaMeses: 24,
-                    porcentaje: 12.5
+                    permanenciaMeses: 24
                 },
                 {
                     id: 'EMP006',
@@ -563,8 +575,7 @@
                     motivoSalida: 'fin-proyecto',
                     motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Implementación de sistema CRM finalizada',
-                    permanenciaMeses: 15,
-                    porcentaje: 12.5
+                    permanenciaMeses: 15
                 },
                 {
                     id: 'EMP007',
@@ -572,17 +583,23 @@
                     motivoSalida: 'renuncia',
                     motivoTexto: 'Renuncia voluntaria',
                     razonSalida: 'Decisión de emprender negocio propio',
-                    permanenciaMeses: 9,
-                    porcentaje: 12.5
+                    permanenciaMeses: 9
                 },
                 {
                     id: 'EMP008',
                     cliente: 'Equifax',
-                    motivoSalida: 'termino-contrato',
-                    motivoTexto: 'Término de contrato',
+                    motivoSalida: 'fin-proyecto',
+                    motivoTexto: 'Fin de proyecto',
                     razonSalida: 'Reducción de equipo por reestructuración',
-                    permanenciaMeses: 4,
-                    porcentaje: 12.5
+                    permanenciaMeses: 4
+                },
+                {
+                    id: 'EMP009',
+                    cliente: 'Equifax',
+                    motivoSalida: 'desvinculacion',
+                    motivoTexto: 'Desvinculación',
+                    razonSalida: 'Bajo rendimiento y incumplimiento de objetivos',
+                    permanenciaMeses: 2
                 }
             ]
         };
@@ -606,9 +623,17 @@
             const classes = {
                 'fin-proyecto': 'motivo-fin-proyecto',
                 'renuncia': 'motivo-renuncia',
-                'termino-contrato': 'motivo-termino-contrato'
+                'desvinculacion': 'motivo-desvinculacion'
             };
             return classes[motivo] || 'motivo-fin-proyecto';
+        }
+
+        function getClientBadgeClass(cliente) {
+            const classes = {
+                'Equifax': 'client-equifax',
+                'Honeywell Chile': 'client-honeywell'
+            };
+            return classes[cliente] || 'client-badge';
         }
 
         // Actualizar título y estadísticas
@@ -700,7 +725,7 @@
             if (pageData.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="5">
                             <div class="empty-state">
                                 <div class="empty-state-icon">🔍</div>
                                 <div class="empty-state-title">No se encontraron resultados</div>
@@ -715,7 +740,7 @@
             tbody.innerHTML = pageData.map(empleado => `
                 <tr>
                     <td>
-                        <div class="client-badge">${empleado.cliente}</div>
+                        <div class="client-badge ${getClientBadgeClass(empleado.cliente)}">${empleado.cliente}</div>
                     </td>
                     <td>
                         <span class="motivo-badge ${getMotivoBadgeClass(empleado.motivoSalida)}">
@@ -727,9 +752,6 @@
                     </td>
                     <td class="permanencia-cell">
                         <span class="permanencia-badge">${empleado.permanenciaMeses} meses</span>
-                    </td>
-                    <td class="percentage-cell">
-                        ${empleado.porcentaje}%
                     </td>
                     <td style="font-family: monospace; color: #64748b;">
                         ${empleado.id}

@@ -334,8 +334,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Construir URL con parámetros
                 const url = `bajas.html?mes=${currentMonth}&ano=${currentYear}&cliente=${currentClient}`;
                 
-                // Abrir en nueva ventana
-                window.open(url, '_blank');
+                // Abrir en misma ventana
+                window.location.href = url;
             });
             
             // Agregar indicador visual de que es clickeable

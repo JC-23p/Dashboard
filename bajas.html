@@ -457,7 +457,7 @@
         <!-- Header -->
         <div class="header">
             <div class="header-left">
-                <a href="javascript:history.back()" class="back-button">
+                <a href="#" id="back-button" class="back-button">
                     ← Volver
                 </a>
                 <div class="header-title">
@@ -847,6 +847,19 @@
                 header.addEventListener('click', () => {
                     sortData(header.dataset.column);
                 });
+            });
+
+            // NUEVO: Botón volver inteligente
+            document.getElementById('back-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Si hay historial, usar history.back()
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    // Si no hay historial (página nueva), ir al dashboard
+                    window.location.href = 'index.html';
+                }
             });
 
             console.log('Página de detalle de bajas cargada:', bajasData);

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<!-- Mantener el header existente -->
+<div class="header">
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Bajas - 23People</title>
@@ -107,7 +109,74 @@
             opacity: 0.9;
             margin-top: 2px;
         }
+/* Sección de motivos */
+.motivos-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 20px 30px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
 
+.motivos-chart-container {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    height: 250px;
+}
+
+.motivos-stats {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    min-width: 300px;
+    align-content: center;
+}
+
+.motivos-stat {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.motivos-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.motivos-stat-label {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Ajustar colores de motivos */
+#fin-proyecto-count {
+    color: #95a5a6; /* Gris */
+}
+
+#renuncia-count {
+    color: #f39c12; /* Naranja */
+}
+
+#desvinculacion-count {
+    color: #e74c3c; /* Rojo */
+}
+
+/* Ajustar tabla (permanencia) */
+.permanencia-cell {
+    text-align: center;
+    font-weight: 500;
+}
+
+.permanencia-cell.low {
+    color: #e74c3c;
+    font-weight: 600;
+}
         /* Toolbar */
         .toolbar {
             padding: 20px 30px;
@@ -452,6 +521,33 @@
         }
     </style>
 </head>
+
+
+<!-- Añadir esta sección después del header -->
+<div class="motivos-section">
+    <div class="motivos-chart-container">
+        <canvas id="motivos-chart"></canvas>
+    </div>
+    <div class="motivos-stats">
+        <div class="motivos-stat">
+            <div class="motivos-stat-value" id="total-bajas-motivo">9</div>
+            <div class="motivos-stat-label">Total Bajas</div>
+        </div>
+        <div class="motivos-stat">
+            <div class="motivos-stat-value" id="fin-proyecto-count">5</div>
+            <div class="motivos-stat-label">Fin de Proyecto</div>
+        </div>
+        <div class="motivos-stat">
+            <div class="motivos-stat-value" id="renuncia-count">3</div>
+            <div class="motivos-stat-label">Renuncias</div>
+        </div>
+        <div class="motivos-stat">
+            <div class="motivos-stat-value" id="desvinculacion-count">1</div>
+            <div class="motivos-stat-label">Desvinculaciones</div>
+        </div>
+    </div>
+</div>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -603,11 +699,89 @@
                 }
             ]
         };
+// Función para actualizar estadísticas y gráfico de motivos
+function updateMotivosStats() {
+    const counts = {
+        'fin-proyecto': 0,
+        'renuncia': 0,
+        'desvinculacion': 0
+    };
+
+    bajasData.empleados.forEach(emp => {
+        counts[emp.motivoSalida]++;
+    });
+
+    // Actualizar contadores
+    document.getElementById('total-bajas-motivo').textContent = bajasData.empleados.length;
+    document.getElementById('fin-proyecto-count').textContent = counts['fin-proyecto'];
+    document.getElementById('renuncia-count').textContent = counts['renuncia'];
+    document.getElementById('desvinculacion-count').textContent = counts['desvinculacion'];
+
+    // Actualizar gráfico
+    updateMotivosChart(counts);
+}
+
+// Función para actualizar el gráfico
+function updateMotivosChart(counts) {
+    const ctx = document.getElementById('motivos-chart');
+    if (motivosChart) {
+        motivosChart.destroy();
+    }
+
+    const total = bajasData.empleados.length;
+    const data = [
+        counts['fin-proyecto'],
+        counts['renuncia'],
+        counts['desvinculacion']
+    ];
+
+    motivosChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Fin de proyecto', 'Renuncia voluntaria', 'Desvinculación'],
+            datasets: [{
+                data: data,
+                backgroundColor: [
+                    '#95a5a6', // fin-proyecto
+                    '#f39c12', // renuncia
+                    '#e74c3c'  // desvinculacion
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 13
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const percentage = (context.raw / total * 100).toFixed(1);
+                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+}
 
         // Estado de la aplicación
         let filteredData = [...bajasData.empleados];
         let currentSort = { column: null, direction: null };
         let currentPage = 1;
+        let motivosChart = null;
         const itemsPerPage = 10;
 
         // Funciones de utilidad
@@ -750,9 +924,9 @@
                     <td style="max-width: 300px;">
                         ${empleado.razonSalida}
                     </td>
-                    <td class="permanencia-cell">
-                        <span class="permanencia-badge">${empleado.permanenciaMeses} meses</span>
-                    </td>
+                    <td class="permanencia-cell ${empleado.permanenciaMeses < 3 ? 'low' : ''}">
+                ${empleado.permanenciaMeses} meses
+            </td>
                     <td style="font-family: monospace; color: #64748b;">
                         ${empleado.id}
                     </td>
@@ -849,6 +1023,20 @@
                 });
             });
 
+            // Inicializar estadísticas y gráfico de motivos
+    updateMotivosStats();
+    
+    // Actualizar cuando se filtren datos
+    document.getElementById('motivo-filter').addEventListener('change', function() {
+        filterData();
+        updateMotivosStats();
+    });
+    
+    document.getElementById('search-input').addEventListener('input', function() {
+        filterData();
+        updateMotivosStats();
+    });
+    
             // NUEVO: Botón volver inteligente
             document.getElementById('back-button').addEventListener('click', function(e) {
                 e.preventDefault();
@@ -867,3 +1055,4 @@
     </script>
 </body>
 </html>
+
